@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - 后台管理系统' : '后台管理系统'}">后台管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <div class="sidebar-brand">
+            <a href="/">
+                <i class="bi bi-gear-wide-connected"></i>
+                后台管理系统
+            </a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item">
+                <i class="bi bi-house-door"></i>
+                首页
+            </a>
+
+            <a href="javascript:void(0)" class="menu-item active" onclick="toggleMenu(this)">
+                <i class="bi bi-gear"></i>
+                系统管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu open">
+                <a href="/system/user" class="menu-item">
+                    <i class="bi bi-person-circle"></i>
+                    系统用户管理
+                </a>
+                <a href="/system/role" class="menu-item">
+                    <i class="bi bi-people-fill"></i>
+                    角色管理
+                </a>
+                <a href="/system/permission" class="menu-item active">
+                    <i class="bi bi-key-fill"></i>
+                    权限管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-person-badge"></i>
+                用户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent" class="menu-item">
+                    <i class="bi bi-building"></i>
+                    代理商管理
+                </a>
+                <a href="/merchant" class="menu-item">
+                    <i class="bi bi-shop"></i>
+                    商户管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-box-seam"></i>
+                产品管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/product" class="menu-item">
+                    <i class="bi bi-cube"></i>
+                    产品信息
+                </a>
+                <a href="/machine" class="menu-item">
+                    <i class="bi bi-hdd"></i>
+                    机器信息
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-wallet2"></i>
+                账户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent-account" class="menu-item">
+                    <i class="bi bi-credit-card"></i>
+                    代理账户
+                </a>
+                <a href="/profit" class="menu-item">
+                    <i class="bi bi-cash-stack"></i>
+                    分润信息
+                </a>
+                <a href="/account-detail" class="menu-item">
+                    <i class="bi bi-list-ul"></i>
+                    账户明细
+                </a>
+                <a href="/statement" class="menu-item">
+                    <i class="bi bi-file-earmark-text"></i>
+                    对账单
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-exchange"></i>
+                交易管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/channel" class="menu-item">
+                    <i class="bi bi-link-45deg"></i>
+                    通道管理
+                </a>
+                <a href="/transaction" class="menu-item">
+                    <i class="bi bi-bar-chart-line"></i>
+                    交易明细
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <nav class="topbar">
+            <div class="topbar-title" th:text="${pageTitle != null ? pageTitle : '权限管理'}">权限管理</div>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-content">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">首页</a></li>
+                    <li class="breadcrumb-item">系统管理</li>
+                    <li class="breadcrumb-item active">权限管理</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">权限列表</h6>
+                    <button class="btn btn-primary btn-sm" onclick="openPermissionModal()">
+                        <i class="bi bi-plus"></i> 新增权限
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>权限名称</th>
+                                    <th>权限编码</th>
+                                    <th>上级权限</th>
+                                    <th>类型</th>
+                                    <th>请求路径</th>
+                                    <th>排序</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permission-table">
+                                <tr>
+                                    <td colspan="9" class="text-center py-3">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="permissionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="permissionModalTitle">新增权限</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="permissionForm">
+                    <input type="hidden" id="perm-id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">权限名称 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="perm-permissionName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">权限编码</label>
+                            <input type="text" class="form-control" id="perm-permissionCode">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">上级权限</label>
+                            <select class="form-select" id="perm-parentId">
+                                <option value="0">根目录</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">类型</label>
+                            <select class="form-select" id="perm-menuType">
+                                <option value="1">菜单</option>
+                                <option value="2">按钮</option>
+                                <option value="3">API</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">请求路径</label>
+                            <input type="text" class="form-control" id="perm-url" placeholder="/api/xxx">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">请求方式</label>
+                            <input type="text" class="form-control" id="perm-method" placeholder="GET, POST, PUT, DELETE">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">图标</label>
+                            <input type="text" class="form-control" id="perm-icon" placeholder="bi bi-xxx">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">排序</label>
+                            <input type="number" class="form-control" id="perm-sort" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="perm-status">
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="savePermission()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container">
+    <div id="toast" class="toast" role="alert">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    let permissionModalInstance = null;
+    let allPermissions = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        permissionModalInstance = new bootstrap.Modal(document.getElementById('permissionModal'));
+        loadPermissionList();
+        loadParentPermissions();
+    });
+
+    function loadPermissionList() {
+        fetch('/system/permission/api/tree')
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200) {
+                    allPermissions = result.data || [];
+                    renderPermissionTable(allPermissions);
+                } else {
+                    showToast('加载失败: ' + (result.msg || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('加载权限列表失败:', error);
+                showToast('加载失败', 'error');
+            });
+    }
+
+    function renderPermissionTable(permissions) {
+        const tbody = document.getElementById('permission-table');
+        if (!permissions || permissions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center py-3">暂无数据</td></tr>';
+            return;
+        }
+
+        let html = '';
+
+        function buildTable(items, level, parentName) {
+            items.forEach(item => {
+                const padding = level * 20;
+                const hasChildren = item.children && item.children.length > 0;
+                const menuTypeText = item.menuType === 1 ? '菜单' : item.menuType === 2 ? '按钮' : 'API';
+                const menuTypeClass = item.menuType === 1 ? 'bg-primary' : item.menuType === 2 ? 'bg-success' : 'bg-info';
+
+                html += `
+                    <tr>
+                        <td>${item.id || '-'}</td>
+                        <td style="padding-left: ${padding}px;">
+                            ${hasChildren ? '<i class="bi bi-caret-right-fill text-secondary me-1"></i>' : '<span class="me-3"></span>'}
+                            ${item.icon ? `<i class="${item.icon} me-1"></i>` : ''}
+                            ${escapeHtml(item.permissionName)}
+                        </td>
+                        <td>${escapeHtml(item.permissionCode || '-')}</td>
+                        <td>${escapeHtml(parentName || '-')}</td>
+                        <td><span class="badge ${menuTypeClass}">${menuTypeText}</span></td>
+                        <td>${escapeHtml(item.url || '-')}</td>
+                        <td>${item.sort || 0}</td>
+                        <td>${getStatusBadge(item.status)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editPermission(${item.id})">
+                                <i class="bi bi-pencil"></i> 编辑
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deletePermission(${item.id})">
+                                <i class="bi bi-trash"></i> 删除
+                            </button>
+                        </td>
+                    </tr>
+                `;
+
+                if (hasChildren) {
+                    buildTable(item.children, level + 1, item.permissionName);
+                }
+            });
+        }
+
+        buildTable(permissions, 0, null);
+        tbody.innerHTML = html;
+    }
+
+    function loadParentPermissions() {
+        fetch('/system/permission/api/form-data')
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const parents = result.data.parents || [];
+                    const select = document.getElementById('perm-parentId');
+                    select.innerHTML = '<option value="0">根目录</option>';
+                    parents.forEach(p => {
+                        if (p.id !== 0) {
+                            select.innerHTML += `<option value="${p.id}">${p.permissionName}</option>`;
+                        }
+                    });
+                }
+            });
+    }
+
+    function openPermissionModal() {
+        document.getElementById('permissionModalTitle').textContent = '新增权限';
+        document.getElementById('permissionForm').reset();
+        document.getElementById('perm-id').value = '';
+        document.getElementById('perm-parentId').value = '0';
+        document.getElementById('perm-menuType').value = '1';
+        document.getElementById('perm-sort').value = '0';
+        document.getElementById('perm-status').value = '1';
+        permissionModalInstance.show();
+    }
+
+    function editPermission(id) {
+        fetch(`/system/permission/api/${id}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const perm = result.data;
+                    document.getElementById('permissionModalTitle').textContent = '编辑权限';
+                    document.getElementById('perm-id').value = perm.id;
+                    document.getElementById('perm-permissionName').value = perm.permissionName || '';
+                    document.getElementById('perm-permissionCode').value = perm.permissionCode || '';
+                    document.getElementById('perm-parentId').value = perm.parentId || '0';
+                    document.getElementById('perm-menuType').value = perm.menuType || '1';
+                    document.getElementById('perm-url').value = perm.url || '';
+                    document.getElementById('perm-method').value = perm.method || '';
+                    document.getElementById('perm-icon').value = perm.icon || '';
+                    document.getElementById('perm-sort').value = perm.sort || 0;
+                    document.getElementById('perm-status').value = perm.status !== null ? perm.status : '1';
+
+                    permissionModalInstance.show();
+                } else {
+                    showToast('获取权限信息失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('获取权限信息失败:', error);
+                showToast('获取权限信息失败', 'error');
+            });
+    }
+
+    function savePermission() {
+        const id = document.getElementById('perm-id').value;
+        const permissionName = document.getElementById('perm-permissionName').value.trim();
+        const permissionCode = document.getElementById('perm-permissionCode').value.trim();
+        const parentId = parseInt(document.getElementById('perm-parentId').value);
+        const menuType = parseInt(document.getElementById('perm-menuType').value);
+        const url = document.getElementById('perm-url').value.trim();
+        const method = document.getElementById('perm-method').value.trim();
+        const icon = document.getElementById('perm-icon').value.trim();
+        const sort = parseInt(document.getElementById('perm-sort').value) || 0;
+        const status = parseInt(document.getElementById('perm-status').value);
+
+        if (!permissionName) {
+            showToast('请输入权限名称', 'error');
+            return;
+        }
+
+        const data = {
+            permissionName: permissionName,
+            permissionCode: permissionCode,
+            parentId: parentId,
+            menuType: menuType,
+            url: url,
+            method: method,
+            icon: icon,
+            sort: sort,
+            status: status
+        };
+
+        let urlApi = '/system/permission/api/add';
+        if (id) {
+            urlApi = '/system/permission/api/update';
+            data.id = parseInt(id);
+        }
+
+        fetch(urlApi, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast(id ? '更新成功' : '添加成功', 'success');
+                permissionModalInstance.hide();
+                loadPermissionList();
+                loadParentPermissions();
+            } else {
+                showToast(result.msg || '操作失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('保存权限失败:', error);
+            showToast('保存失败', 'error');
+        });
+    }
+
+    function deletePermission(id) {
+        if (!confirm('确定要删除该权限吗？')) {
+            return;
+        }
+
+        fetch(`/system/permission/api/delete/${id}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast('删除成功', 'success');
+                loadPermissionList();
+                loadParentPermissions();
+            } else {
+                showToast(result.msg || '删除失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('删除权限失败:', error);
+            showToast('删除失败', 'error');
+        });
+    }
+</script>
+</body>
+</html>

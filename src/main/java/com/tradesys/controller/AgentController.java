@@ -3,9 +3,14 @@ package com.tradesys.controller;
 import com.tradesys.common.PageQuery;
 import com.tradesys.common.Result;
 import com.tradesys.entity.Agent;
+import com.tradesys.entity.SysRole;
+import com.tradesys.entity.SysUser;
 import com.tradesys.service.AgentService;
+import com.tradesys.service.SysUserService;
+import com.tradesys.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,10 +22,28 @@ import java.util.Map;
 public class AgentController {
 
     private final AgentService agentService;
+    private final SysUserService sysUserService;
 
     @GetMapping
-    public String list() {
-        return "user/agent";
+    public String list(Model model) {
+        addUserInfoToModel(model);
+        model.addAttribute("pageTitle", "代理商管理");
+        model.addAttribute("activeMenu", "agent");
+        return "agent";
+    }
+
+    private void addUserInfoToModel(Model model) {
+        String username = SecurityUtils.getUsername();
+        if (username != null) {
+            SysUser user = sysUserService.getByUsername(username);
+            if (user != null) {
+                model.addAttribute("currentUser", user);
+                List<SysRole> roles = sysUserService.getUserRoles(user.getId());
+                if (roles != null && !roles.isEmpty()) {
+                    model.addAttribute("currentRole", roles.get(0).getRoleName());
+                }
+            }
+        }
     }
 
     @GetMapping("/api/list")

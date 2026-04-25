@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - 后台管理系统' : '后台管理系统'}">后台管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <div class="sidebar-brand">
+            <a href="/">
+                <i class="bi bi-gear-wide-connected"></i>
+                后台管理系统
+            </a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item">
+                <i class="bi bi-house-door"></i>
+                首页
+            </a>
+
+            <a href="javascript:void(0)" class="menu-item active" onclick="toggleMenu(this)">
+                <i class="bi bi-gear"></i>
+                系统管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu open">
+                <a href="/system/user" class="menu-item">
+                    <i class="bi bi-person-circle"></i>
+                    系统用户管理
+                </a>
+                <a href="/system/role" class="menu-item active">
+                    <i class="bi bi-people-fill"></i>
+                    角色管理
+                </a>
+                <a href="/system/permission" class="menu-item">
+                    <i class="bi bi-key-fill"></i>
+                    权限管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-person-badge"></i>
+                用户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent" class="menu-item">
+                    <i class="bi bi-building"></i>
+                    代理商管理
+                </a>
+                <a href="/merchant" class="menu-item">
+                    <i class="bi bi-shop"></i>
+                    商户管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-box-seam"></i>
+                产品管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/product" class="menu-item">
+                    <i class="bi bi-cube"></i>
+                    产品信息
+                </a>
+                <a href="/machine" class="menu-item">
+                    <i class="bi bi-hdd"></i>
+                    机器信息
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-wallet2"></i>
+                账户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent-account" class="menu-item">
+                    <i class="bi bi-credit-card"></i>
+                    代理账户
+                </a>
+                <a href="/profit" class="menu-item">
+                    <i class="bi bi-cash-stack"></i>
+                    分润信息
+                </a>
+                <a href="/account-detail" class="menu-item">
+                    <i class="bi bi-list-ul"></i>
+                    账户明细
+                </a>
+                <a href="/statement" class="menu-item">
+                    <i class="bi bi-file-earmark-text"></i>
+                    对账单
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-exchange"></i>
+                交易管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/channel" class="menu-item">
+                    <i class="bi bi-link-45deg"></i>
+                    通道管理
+                </a>
+                <a href="/transaction" class="menu-item">
+                    <i class="bi bi-bar-chart-line"></i>
+                    交易明细
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <nav class="topbar">
+            <div class="topbar-title" th:text="${pageTitle != null ? pageTitle : '角色管理'}">角色管理</div>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-content">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">首页</a></li>
+                    <li class="breadcrumb-item">系统管理</li>
+                    <li class="breadcrumb-item active">角色管理</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="d-flex flex-wrap gap-3">
+                                <div>
+                                    <label class="form-label small text-muted mb-1">角色名称</label>
+                                    <input type="text" class="form-control form-control-sm" id="search-roleName" placeholder="请输入角色名称">
+                                </div>
+                                <div>
+                                    <label class="form-label small text-muted mb-1">状态</label>
+                                    <select class="form-select form-select-sm" id="search-roleStatus">
+                                        <option value="">全部</option>
+                                        <option value="1">启用</option>
+                                        <option value="0">禁用</option>
+                                    </select>
+                                </div>
+                                <div class="align-self-end">
+                                    <button class="btn btn-primary btn-sm" onclick="searchRole()">
+                                        <i class="bi bi-search"></i> 查询
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm ms-2" onclick="resetRoleSearch()">
+                                        <i class="bi bi-arrow-repeat"></i> 重置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm" onclick="openRoleModal()">
+                                <i class="bi bi-plus"></i> 新增角色
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>角色名称</th>
+                                    <th>角色编码</th>
+                                    <th>描述</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="role-table">
+                                <tr>
+                                    <td colspan="7" class="text-center py-3">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <span class="small text-muted">共 <span id="role-total">0</span> 条记录</span>
+                        </div>
+                        <div class="col-auto">
+                            <nav id="role-pagination"></nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="roleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roleModalTitle">新增角色</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="roleForm">
+                    <input type="hidden" id="role-id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">角色名称 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="role-roleName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">角色编码 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="role-roleCode" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="role-status">
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">描述</label>
+                            <textarea class="form-control" id="role-description" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">权限分配</label>
+                            <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                <div id="permission-tree">
+                                    加载中...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveRole()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container">
+    <div id="toast" class="toast" role="alert">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    let roleCurrentPage = 1;
+    let rolePageSize = 10;
+    let roleModalInstance = null;
+    let allPermissions = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        roleModalInstance = new bootstrap.Modal(document.getElementById('roleModal'));
+        loadRoleList();
+    });
+
+    function loadRoleList() {
+        const roleName = document.getElementById('search-roleName').value;
+        const status = document.getElementById('search-roleStatus').value;
+
+        let url = `/system/role/api/list?pageNum=${roleCurrentPage}&pageSize=${rolePageSize}`;
+        if (roleName) url += `&roleName=${encodeURIComponent(roleName)}`;
+        if (status) url += `&status=${status}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200) {
+                    renderRoleTable(result.data);
+                    renderRolePagination(result.total);
+                    document.getElementById('role-total').textContent = result.total || 0;
+                } else {
+                    showToast('加载失败: ' + (result.msg || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('加载角色列表失败:', error);
+                showToast('加载失败', 'error');
+            });
+    }
+
+    function renderRoleTable(data) {
+        const tbody = document.getElementById('role-table');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-3">暂无数据</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(role => {
+            return `
+                <tr>
+                    <td>${role.id || '-'}</td>
+                    <td>${escapeHtml(role.roleName)}</td>
+                    <td>${escapeHtml(role.roleCode || '-')}</td>
+                    <td>${escapeHtml(role.description || '-')}</td>
+                    <td>${getStatusBadge(role.status)}</td>
+                    <td>${role.createTime ? formatDateTime(role.createTime) : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editRole(${role.id})">
+                            <i class="bi bi-pencil"></i> 编辑
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRole(${role.id})">
+                            <i class="bi bi-trash"></i> 删除
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderRolePagination(total) {
+        const totalPages = Math.ceil(total / rolePageSize);
+        const pagination = document.getElementById('role-pagination');
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let html = '<ul class="pagination pagination-sm mb-0">';
+
+        html += `<li class="page-item ${roleCurrentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToRolePage(${roleCurrentPage - 1})">上一页</a>
+        </li>`;
+
+        for (let i = 1; i <= totalPages && i <= 10; i++) {
+            html += `<li class="page-item ${i === roleCurrentPage ? 'active' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="goToRolePage(${i})">${i}</a>
+            </li>`;
+        }
+
+        html += `<li class="page-item ${roleCurrentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToRolePage(${roleCurrentPage + 1})">下一页</a>
+        </li>`;
+
+        html += '</ul>';
+        pagination.innerHTML = html;
+    }
+
+    function goToRolePage(page) {
+        roleCurrentPage = page;
+        loadRoleList();
+    }
+
+    function searchRole() {
+        roleCurrentPage = 1;
+        loadRoleList();
+    }
+
+    function resetRoleSearch() {
+        document.getElementById('search-roleName').value = '';
+        document.getElementById('search-roleStatus').value = '';
+        searchRole();
+    }
+
+    function openRoleModal() {
+        document.getElementById('roleModalTitle').textContent = '新增角色';
+        document.getElementById('roleForm').reset();
+        document.getElementById('role-id').value = '';
+        document.getElementById('role-status').value = '1';
+        loadPermissionTree(null);
+        roleModalInstance.show();
+    }
+
+    function loadPermissionTree(selectedIds) {
+        fetch('/system/role/api/form-data')
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    allPermissions = result.data.permissions || [];
+                    renderPermissionTree(allPermissions, selectedIds);
+                }
+            });
+    }
+
+    function renderPermissionTree(permissions, selectedIds) {
+        const container = document.getElementById('permission-tree');
+        if (!permissions || permissions.length === 0) {
+            container.innerHTML = '暂无权限数据';
+            return;
+        }
+
+        const selectedSet = selectedIds ? new Set(selectedIds) : new Set();
+
+        function buildTree(items, level) {
+            let html = '';
+            items.forEach(item => {
+                const hasChildren = item.children && item.children.length > 0;
+                const padding = level * 20;
+                const checked = selectedSet.has(item.id) ? 'checked' : '';
+
+                html += `
+                    <div style="padding-left: ${padding}px; margin-bottom: 5px;">
+                        <div class="form-check">
+                            <input class="form-check-input permission-checkbox" type="checkbox" value="${item.id}" id="perm-${item.id}" ${checked} data-has-children="${hasChildren}">
+                            <label class="form-check-label" for="perm-${item.id}">
+                                ${item.permissionName}
+                                <span class="text-muted small">(${item.permissionCode || '-'})</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+
+                if (hasChildren) {
+                    html += buildTree(item.children, level + 1);
+                }
+            });
+            return html;
+        }
+
+        container.innerHTML = buildTree(permissions, 0);
+    }
+
+    function editRole(id) {
+        fetch(`/system/role/api/${id}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const role = result.data;
+                    document.getElementById('roleModalTitle').textContent = '编辑角色';
+                    document.getElementById('role-id').value = role.id;
+                    document.getElementById('role-roleName').value = role.roleName || '';
+                    document.getElementById('role-roleCode').value = role.roleCode || '';
+                    document.getElementById('role-description').value = role.description || '';
+                    document.getElementById('role-status').value = role.status !== null ? role.status : '1';
+
+                    const permissionIds = role.permissionIds || [];
+                    loadPermissionTree(permissionIds);
+
+                    roleModalInstance.show();
+                } else {
+                    showToast('获取角色信息失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('获取角色信息失败:', error);
+                showToast('获取角色信息失败', 'error');
+            });
+    }
+
+    function saveRole() {
+        const id = document.getElementById('role-id').value;
+        const roleName = document.getElementById('role-roleName').value.trim();
+        const roleCode = document.getElementById('role-roleCode').value.trim();
+        const description = document.getElementById('role-description').value.trim();
+        const status = parseInt(document.getElementById('role-status').value);
+
+        const checkboxes = document.querySelectorAll('.permission-checkbox:checked');
+        const permissionIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+        if (!roleName) {
+            showToast('请输入角色名称', 'error');
+            return;
+        }
+
+        if (!roleCode) {
+            showToast('请输入角色编码', 'error');
+            return;
+        }
+
+        const data = {
+            roleName: roleName,
+            roleCode: roleCode,
+            description: description,
+            status: status,
+            permissionIds: permissionIds
+        };
+
+        let url = '/system/role/api/add';
+        if (id) {
+            url = '/system/role/api/update';
+            data.id = parseInt(id);
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast(id ? '更新成功' : '添加成功', 'success');
+                roleModalInstance.hide();
+                loadRoleList();
+            } else {
+                showToast(result.msg || '操作失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('保存角色失败:', error);
+            showToast('保存失败', 'error');
+        });
+    }
+
+    function deleteRole(id) {
+        if (!confirm('确定要删除该角色吗？')) {
+            return;
+        }
+
+        fetch(`/system/role/api/delete/${id}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast('删除成功', 'success');
+                loadRoleList();
+            } else {
+                showToast(result.msg || '删除失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('删除角色失败:', error);
+            showToast('删除失败', 'error');
+        });
+    }
+</script>
+</body>
+</html>

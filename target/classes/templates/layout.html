@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - 后台管理系统'">后台管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <style>
+        th:block {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <div class="sidebar-brand">
+            <a href="/">
+                <i class="bi bi-gear-wide-connected"></i>
+                后台管理系统
+            </a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item" th:classappend="${activeMenu == 'dashboard'} ? 'active' : ''">
+                <i class="bi bi-house-door"></i>
+                首页
+            </a>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)"
+               th:classappend="${#strings.startsWith(activeMenu, 'system-')} ? 'expanded' : ''">
+                <i class="bi bi-gear"></i>
+                系统管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu" th:classappend="${#strings.startsWith(activeMenu, 'system-')} ? 'show' : ''">
+                <a href="/system/user" class="menu-item" th:classappend="${activeMenu == 'system-user'} ? 'active' : ''">
+                    <i class="bi bi-person-circle"></i>
+                    系统用户管理
+                </a>
+                <a href="/system/role" class="menu-item" th:classappend="${activeMenu == 'system-role'} ? 'active' : ''">
+                    <i class="bi bi-people-fill"></i>
+                    角色管理
+                </a>
+                <a href="/system/permission" class="menu-item" th:classappend="${activeMenu == 'system-permission'} ? 'active' : ''">
+                    <i class="bi bi-key-fill"></i>
+                    权限管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)"
+               th:classappend="${activeMenu == 'agent' || activeMenu == 'merchant'} ? 'expanded' : ''">
+                <i class="bi bi-person-badge"></i>
+                用户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu" th:classappend="${activeMenu == 'agent' || activeMenu == 'merchant'} ? 'show' : ''">
+                <a href="/agent" class="menu-item" th:classappend="${activeMenu == 'agent'} ? 'active' : ''">
+                    <i class="bi bi-building"></i>
+                    代理商管理
+                </a>
+                <a href="/merchant" class="menu-item" th:classappend="${activeMenu == 'merchant'} ? 'active' : ''">
+                    <i class="bi bi-shop"></i>
+                    商户管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)"
+               th:classappend="${activeMenu == 'product' || activeMenu == 'machine'} ? 'expanded' : ''">
+                <i class="bi bi-box-seam"></i>
+                产品管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu" th:classappend="${activeMenu == 'product' || activeMenu == 'machine'} ? 'show' : ''">
+                <a href="/product" class="menu-item" th:classappend="${activeMenu == 'product'} ? 'active' : ''">
+                    <i class="bi bi-cube"></i>
+                    产品信息
+                </a>
+                <a href="/machine" class="menu-item" th:classappend="${activeMenu == 'machine'} ? 'active' : ''">
+                    <i class="bi bi-hdd"></i>
+                    机器信息
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)"
+               th:classappend="${activeMenu == 'agent-account' || activeMenu == 'profit' || activeMenu == 'account-detail' || activeMenu == 'statement'} ? 'expanded' : ''">
+                <i class="bi bi-wallet2"></i>
+                账户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu" th:classappend="${activeMenu == 'agent-account' || activeMenu == 'profit' || activeMenu == 'account-detail' || activeMenu == 'statement'} ? 'show' : ''">
+                <a href="/agent-account" class="menu-item" th:classappend="${activeMenu == 'agent-account'} ? 'active' : ''">
+                    <i class="bi bi-credit-card"></i>
+                    代理账户
+                </a>
+                <a href="/profit" class="menu-item" th:classappend="${activeMenu == 'profit'} ? 'active' : ''">
+                    <i class="bi bi-cash-stack"></i>
+                    分润信息
+                </a>
+                <a href="/account-detail" class="menu-item" th:classappend="${activeMenu == 'account-detail'} ? 'active' : ''">
+                    <i class="bi bi-list-ul"></i>
+                    账户明细
+                </a>
+                <a href="/statement" class="menu-item" th:classappend="${activeMenu == 'statement'} ? 'active' : ''">
+                    <i class="bi bi-file-earmark-text"></i>
+                    对账单
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)"
+               th:classappend="${activeMenu == 'channel' || activeMenu == 'transaction'} ? 'expanded' : ''">
+                <i class="bi bi-exchange"></i>
+                交易管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu" th:classappend="${activeMenu == 'channel' || activeMenu == 'transaction'} ? 'show' : ''">
+                <a href="/channel" class="menu-item" th:classappend="${activeMenu == 'channel'} ? 'active' : ''">
+                    <i class="bi bi-link-45deg"></i>
+                    通道管理
+                </a>
+                <a href="/transaction" class="menu-item" th:classappend="${activeMenu == 'transaction'} ? 'active' : ''">
+                    <i class="bi bi-bar-chart-line"></i>
+                    交易明细
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <nav class="topbar">
+            <div class="topbar-title" th:text="${pageTitle}">首页</div>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-content">
+            <th:block th:fragment="content">
+                <div class="empty-state">
+                    <i class="bi bi-tools"></i>
+                    <h4>页面内容</h4>
+                    <p class="text-muted">该页面内容需要在子页面中定义</p>
+                </div>
+            </th:block>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container">
+    <div id="toast" class="toast" role="alert">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<th:block th:fragment="scripts"></th:block>
+</body>
+</html>

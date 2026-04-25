@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - 后台管理系统' : '后台管理系统'}">后台管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <div class="sidebar-brand">
+            <a href="/">
+                <i class="bi bi-gear-wide-connected"></i>
+                后台管理系统
+            </a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item">
+                <i class="bi bi-house-door"></i>
+                首页
+            </a>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-gear"></i>
+                系统管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/system/user" class="menu-item">
+                    <i class="bi bi-person-circle"></i>
+                    系统用户管理
+                </a>
+                <a href="/system/role" class="menu-item">
+                    <i class="bi bi-people-fill"></i>
+                    角色管理
+                </a>
+                <a href="/system/permission" class="menu-item">
+                    <i class="bi bi-key-fill"></i>
+                    权限管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-person-badge"></i>
+                用户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent" class="menu-item">
+                    <i class="bi bi-building"></i>
+                    代理商管理
+                </a>
+                <a href="/merchant" class="menu-item">
+                    <i class="bi bi-shop"></i>
+                    商户管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-box-seam"></i>
+                产品管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/product" class="menu-item">
+                    <i class="bi bi-cube"></i>
+                    产品信息
+                </a>
+                <a href="/machine" class="menu-item">
+                    <i class="bi bi-hdd"></i>
+                    机器信息
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item active" onclick="toggleMenu(this)">
+                <i class="bi bi-wallet2"></i>
+                账户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu open">
+                <a href="/agent-account" class="menu-item active">
+                    <i class="bi bi-credit-card"></i>
+                    代理账户
+                </a>
+                <a href="/profit" class="menu-item">
+                    <i class="bi bi-cash-stack"></i>
+                    分润信息
+                </a>
+                <a href="/account-detail" class="menu-item">
+                    <i class="bi bi-list-ul"></i>
+                    账户明细
+                </a>
+                <a href="/statement" class="menu-item">
+                    <i class="bi bi-file-earmark-text"></i>
+                    对账单
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-exchange"></i>
+                交易管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/channel" class="menu-item">
+                    <i class="bi bi-link-45deg"></i>
+                    通道管理
+                </a>
+                <a href="/transaction" class="menu-item">
+                    <i class="bi bi-bar-chart-line"></i>
+                    交易明细
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <nav class="topbar">
+            <div class="topbar-title" th:text="${pageTitle != null ? pageTitle : '代理账户'}">代理账户</div>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-content">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">首页</a></li>
+                    <li class="breadcrumb-item">账户管理</li>
+                    <li class="breadcrumb-item active">代理账户</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="d-flex flex-wrap gap-3">
+                                <div>
+                                    <label class="form-label small text-muted mb-1">代理商</label>
+                                    <input type="text" class="form-control form-control-sm" id="search-agentName" placeholder="请输入代理商名称">
+                                </div>
+                                <div>
+                                    <label class="form-label small text-muted mb-1">状态</label>
+                                    <select class="form-select form-select-sm" id="search-accountStatus">
+                                        <option value="">全部</option>
+                                        <option value="1">正常</option>
+                                        <option value="0">冻结</option>
+                                    </select>
+                                </div>
+                                <div class="align-self-end">
+                                    <button class="btn btn-primary btn-sm" onclick="searchAgentAccount()">
+                                        <i class="bi bi-search"></i> 查询
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm ms-2" onclick="resetAgentAccountSearch()">
+                                        <i class="bi bi-arrow-repeat"></i> 重置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>代理商</th>
+                                    <th>账户余额</th>
+                                    <th>冻结金额</th>
+                                    <th>累计收入</th>
+                                    <th>累计提现</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agent-account-table">
+                                <tr>
+                                    <td colspan="8" class="text-center py-3">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <span class="small text-muted">共 <span id="agent-account-total">0</span> 条记录</span>
+                        </div>
+                        <div class="col-auto">
+                            <nav id="agent-account-pagination"></nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container">
+    <div id="toast" class="toast" role="alert">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    let agentAccountCurrentPage = 1;
+    let agentAccountPageSize = 10;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAgentAccountList();
+    });
+
+    function loadAgentAccountList() {
+        const agentName = document.getElementById('search-agentName').value;
+        const status = document.getElementById('search-accountStatus').value;
+
+        let url = `/api/agent-account/list?pageNum=${agentAccountCurrentPage}&pageSize=${agentAccountPageSize}`;
+        if (agentName) url += `&agentName=${encodeURIComponent(agentName)}`;
+        if (status) url += `&status=${status}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200) {
+                    renderAgentAccountTable(result.data);
+                    renderAgentAccountPagination(result.total);
+                    document.getElementById('agent-account-total').textContent = result.total || 0;
+                } else {
+                    showToast('加载失败: ' + (result.msg || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('加载代理账户列表失败:', error);
+                showToast('加载失败', 'error');
+            });
+    }
+
+    function renderAgentAccountTable(data) {
+        const tbody = document.getElementById('agent-account-table');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3">暂无数据</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(account => {
+            const statusBadge = account.status === 1 ? '<span class="badge bg-success">正常</span>' : '<span class="badge bg-danger">冻结</span>';
+            return `
+                <tr>
+                    <td>${account.id || '-'}</td>
+                    <td>${escapeHtml(account.agentName || account.agentNo || '-')}</td>
+                    <td><span class="text-primary">¥${account.balance || '0.00'}</span></td>
+                    <td><span class="text-warning">¥${account.frozenAmount || '0.00'}</span></td>
+                    <td><span class="text-success">¥${account.totalIncome || '0.00'}</span></td>
+                    <td><span class="text-info">¥${account.totalWithdraw || '0.00'}</span></td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewAccountDetail(${account.agentId})">
+                            <i class="bi bi-eye"></i> 明细
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderAgentAccountPagination(total) {
+        const totalPages = Math.ceil(total / agentAccountPageSize);
+        const pagination = document.getElementById('agent-account-pagination');
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let html = '<ul class="pagination pagination-sm mb-0">';
+
+        html += `<li class="page-item ${agentAccountCurrentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToAgentAccountPage(${agentAccountCurrentPage - 1})">上一页</a>
+        </li>`;
+
+        for (let i = 1; i <= totalPages && i <= 10; i++) {
+            html += `<li class="page-item ${i === agentAccountCurrentPage ? 'active' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="goToAgentAccountPage(${i})">${i}</a>
+            </li>`;
+        }
+
+        html += `<li class="page-item ${agentAccountCurrentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToAgentAccountPage(${agentAccountCurrentPage + 1})">下一页</a>
+        </li>`;
+
+        html += '</ul>';
+        pagination.innerHTML = html;
+    }
+
+    function goToAgentAccountPage(page) {
+        agentAccountCurrentPage = page;
+        loadAgentAccountList();
+    }
+
+    function searchAgentAccount() {
+        agentAccountCurrentPage = 1;
+        loadAgentAccountList();
+    }
+
+    function resetAgentAccountSearch() {
+        document.getElementById('search-agentName').value = '';
+        document.getElementById('search-accountStatus').value = '';
+        searchAgentAccount();
+    }
+
+    function viewAccountDetail(agentId) {
+        window.location.href = `/account-detail?agentId=${agentId}`;
+    }
+</script>
+</body>
+</html>

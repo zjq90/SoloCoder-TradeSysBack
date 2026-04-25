@@ -22,9 +22,12 @@ CREATE TABLE IF NOT EXISTS sys_user (
     phone VARCHAR(20) COMMENT '手机号',
     email VARCHAR(100) COMMENT '邮箱',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-禁用, 1-启用',
+    agent_id BIGINT DEFAULT NULL COMMENT '关联代理商ID(用于数据权限)',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    INDEX idx_username (username)
+    INDEX idx_username (username),
+    INDEX idx_agent_id (agent_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统用户表';
 
 -- 角色表
@@ -34,6 +37,7 @@ CREATE TABLE IF NOT EXISTS sys_role (
     role_code VARCHAR(50) NOT NULL UNIQUE COMMENT '角色编码',
     description VARCHAR(255) COMMENT '描述',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-禁用, 1-启用',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
@@ -50,6 +54,7 @@ CREATE TABLE IF NOT EXISTS sys_permission (
     icon VARCHAR(50) COMMENT '图标',
     sort INT DEFAULT 0 COMMENT '排序',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-禁用, 1-启用',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_parent_id (parent_id)
@@ -60,6 +65,7 @@ CREATE TABLE IF NOT EXISTS sys_user_role (
     id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
     user_id BIGINT NOT NULL COMMENT '用户ID',
     role_id BIGINT NOT NULL COMMENT '角色ID',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     UNIQUE KEY uk_user_role (user_id, role_id),
     INDEX idx_user_id (user_id),
@@ -71,6 +77,7 @@ CREATE TABLE IF NOT EXISTS sys_role_permission (
     id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
     role_id BIGINT NOT NULL COMMENT '角色ID',
     permission_id BIGINT NOT NULL COMMENT '权限ID',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     UNIQUE KEY uk_role_permission (role_id, permission_id),
     INDEX idx_role_id (role_id),
@@ -97,6 +104,7 @@ CREATE TABLE IF NOT EXISTS agent (
     status TINYINT DEFAULT 1 COMMENT '状态: 0-禁用, 1-启用',
     direct_merchant_count INT DEFAULT 0 COMMENT '直属商户数量',
     total_merchant_count INT DEFAULT 0 COMMENT '总商户数量(含下级)',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_parent_id (parent_id),
@@ -123,6 +131,7 @@ CREATE TABLE IF NOT EXISTS merchant (
     bank_name VARCHAR(100) COMMENT '开户银行',
     bank_account VARCHAR(50) COMMENT '银行账号',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-禁用, 1-启用',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_parent_id (parent_id),
@@ -143,6 +152,7 @@ CREATE TABLE IF NOT EXISTS product (
     cost_price DECIMAL(10,2) DEFAULT 0.00 COMMENT '成本价',
     default_rate DECIMAL(5,4) DEFAULT 0.0000 COMMENT '默认费率',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-禁用, 1-启用',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='产品信息表';
@@ -162,6 +172,7 @@ CREATE TABLE IF NOT EXISTS machine (
     status TINYINT DEFAULT 0 COMMENT '状态: 0-库存, 1-已出库, 2-已绑定, 3-故障',
     purchase_date DATE COMMENT '采购日期',
     activate_time DATETIME COMMENT '激活时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_machine_no (machine_no),
@@ -181,6 +192,7 @@ CREATE TABLE IF NOT EXISTS agent_product (
     product_id BIGINT NOT NULL COMMENT '产品ID',
     profit_rate DECIMAL(5,4) DEFAULT 0.0000 COMMENT '分润费率(如0.0012表示万12)',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-禁用, 1-启用',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     UNIQUE KEY uk_agent_product (agent_id, product_id),
@@ -200,6 +212,7 @@ CREATE TABLE IF NOT EXISTS agent_account (
     total_income DECIMAL(15,2) DEFAULT 0.00 COMMENT '累计收益',
     total_withdraw DECIMAL(15,2) DEFAULT 0.00 COMMENT '累计提现',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-冻结, 1-正常',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_agent_id (agent_id)
@@ -220,6 +233,7 @@ CREATE TABLE IF NOT EXISTS channel (
     single_limit DECIMAL(12,2) DEFAULT 0.00 COMMENT '单笔限额(0表示不限制)',
     merchant_limit DECIMAL(12,2) DEFAULT 0.00 COMMENT '商户单笔限额',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-关闭, 1-开启',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通道管理表';
@@ -231,6 +245,7 @@ CREATE TABLE IF NOT EXISTS channel_daily_stat (
     stat_date DATE NOT NULL COMMENT '统计日期',
     total_amount DECIMAL(15,2) DEFAULT 0.00 COMMENT '当日交易总额',
     total_count INT DEFAULT 0 COMMENT '当日交易笔数',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     UNIQUE KEY uk_channel_date (channel_id, stat_date),
@@ -258,6 +273,7 @@ CREATE TABLE IF NOT EXISTS transaction (
     profit_amount DECIMAL(10,2) DEFAULT 0.00 COMMENT '分润金额',
     status TINYINT DEFAULT 0 COMMENT '交易状态: 0-处理中, 1-成功, 2-失败, 3-已撤销',
     trans_time DATETIME COMMENT '交易时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_trans_no (trans_no),
@@ -285,6 +301,7 @@ CREATE TABLE IF NOT EXISTS profit_share (
     parent_agent_id BIGINT COMMENT '上级代理商ID(用于层级展示)',
     status TINYINT DEFAULT 1 COMMENT '状态: 0-待结算, 1-已结算',
     settle_time DATETIME COMMENT '结算时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     INDEX idx_profit_no (profit_no),
     INDEX idx_agent_id (agent_id),
@@ -307,6 +324,7 @@ CREATE TABLE IF NOT EXISTS account_detail (
     after_balance DECIMAL(15,2) COMMENT '变动后余额',
     relate_no VARCHAR(50) COMMENT '关联单号(分润号/提现单号)',
     remark VARCHAR(255) COMMENT '备注',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     INDEX idx_detail_no (detail_no),
     INDEX idx_agent_id (agent_id),
@@ -329,6 +347,7 @@ CREATE TABLE IF NOT EXISTS statement (
     status TINYINT DEFAULT 0 COMMENT '状态: 0-待确认, 1-已确认, 2-有异议',
     confirm_time DATETIME COMMENT '确认时间',
     remark VARCHAR(500) COMMENT '备注',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     UNIQUE KEY uk_agent_date (agent_id, stat_date),
@@ -355,6 +374,7 @@ CREATE TABLE IF NOT EXISTS withdraw (
     reject_reason VARCHAR(255) COMMENT '拒绝原因',
     apply_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
     process_time DATETIME COMMENT '处理时间',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记: 0-未删除, 1-已删除',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_withdraw_no (withdraw_no),

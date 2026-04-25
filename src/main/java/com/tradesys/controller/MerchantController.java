@@ -6,11 +6,16 @@ import com.tradesys.common.PageQuery;
 import com.tradesys.common.Result;
 import com.tradesys.entity.Agent;
 import com.tradesys.entity.Merchant;
+import com.tradesys.entity.SysRole;
+import com.tradesys.entity.SysUser;
 import com.tradesys.mapper.AgentMapper;
 import com.tradesys.mapper.MerchantMapper;
+import com.tradesys.service.SysUserService;
+import com.tradesys.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -24,10 +29,28 @@ public class MerchantController {
 
     private final MerchantMapper merchantMapper;
     private final AgentMapper agentMapper;
+    private final SysUserService sysUserService;
 
     @GetMapping
-    public String list() {
-        return "user/merchant";
+    public String list(Model model) {
+        addUserInfoToModel(model);
+        model.addAttribute("pageTitle", "商户管理");
+        model.addAttribute("activeMenu", "merchant");
+        return "merchant";
+    }
+
+    private void addUserInfoToModel(Model model) {
+        String username = SecurityUtils.getUsername();
+        if (username != null) {
+            SysUser user = sysUserService.getByUsername(username);
+            if (user != null) {
+                model.addAttribute("currentUser", user);
+                List<SysRole> roles = sysUserService.getUserRoles(user.getId());
+                if (roles != null && !roles.isEmpty()) {
+                    model.addAttribute("currentRole", roles.get(0).getRoleName());
+                }
+            }
+        }
     }
 
     @GetMapping("/api/list")

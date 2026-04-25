@@ -2,30 +2,26 @@ package com.tradesys.config;
 
 import com.tradesys.service.SysUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final SysUserService sysUserService;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(sysUserService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(sysUserService).passwordEncoder(passwordEncoder);
     }
 
     @Override
@@ -34,6 +30,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .authorizeRequests()
                 .antMatchers("/login", "/error", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                .antMatchers("/system/user/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                .antMatchers("/system/role/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                .antMatchers("/system/permission/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 .antMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
             .and()
