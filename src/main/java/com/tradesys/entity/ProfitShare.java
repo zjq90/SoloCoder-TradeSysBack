@@ -1,19 +1,20 @@
 package com.tradesys.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @TableName("profit_share")
-public class ProfitShare extends BaseEntity {
+public class ProfitShare implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
     private String profitNo;
     private Long transactionId;
@@ -27,6 +28,12 @@ public class ProfitShare extends BaseEntity {
     private Long parentAgentId;
     private Integer status;
     private LocalDateTime settleTime;
+
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    @TableLogic
+    private Integer deleted;
 
     @TableField(exist = false)
     private String agentName;

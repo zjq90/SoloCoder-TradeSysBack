@@ -1,5 +1,6 @@
 package com.tradesys.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,6 +11,8 @@ public class Result<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer code;
+    
+    @JsonProperty("msg")
     private String message;
     private T data;
     private Long total;

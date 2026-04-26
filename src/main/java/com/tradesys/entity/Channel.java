@@ -22,6 +22,7 @@ public class Channel extends BaseEntity {
     private BigDecimal dailyLimit;
     private BigDecimal singleLimit;
     private BigDecimal merchantLimit;
+    private BigDecimal thresholdPercent;
     private Integer status;
 
     @TableField(exist = false)

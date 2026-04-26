@@ -21,6 +21,11 @@ public class SysUser extends BaseEntity {
     private String email;
     private Integer status;
 
+    private Long agentId;
+
+    @TableField(exist = false)
+    private String agentName;
+
     @TableField(exist = false)
     private List<SysRole> roles;
 

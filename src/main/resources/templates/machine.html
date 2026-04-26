@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - 后台管理系统' : '后台管理系统'}">后台管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <div class="sidebar-brand">
+            <a href="/">
+                <i class="bi bi-gear-wide-connected"></i>
+                后台管理系统
+            </a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item">
+                <i class="bi bi-house-door"></i>
+                首页
+            </a>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-gear"></i>
+                系统管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/system/user" class="menu-item">
+                    <i class="bi bi-person-circle"></i>
+                    系统用户管理
+                </a>
+                <a href="/system/role" class="menu-item">
+                    <i class="bi bi-people-fill"></i>
+                    角色管理
+                </a>
+                <a href="/system/permission" class="menu-item">
+                    <i class="bi bi-key-fill"></i>
+                    权限管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-person-badge"></i>
+                用户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent" class="menu-item">
+                    <i class="bi bi-building"></i>
+                    代理商管理
+                </a>
+                <a href="/merchant" class="menu-item">
+                    <i class="bi bi-shop"></i>
+                    商户管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item active" onclick="toggleMenu(this)">
+                <i class="bi bi-box-seam"></i>
+                产品管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu open">
+                <a href="/product" class="menu-item">
+                    <i class="bi bi-box"></i>
+                    产品信息
+                </a>
+                <a href="/machine" class="menu-item active">
+                    <i class="bi bi-hdd"></i>
+                    机器信息
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-wallet2"></i>
+                账户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent-account" class="menu-item">
+                    <i class="bi bi-credit-card"></i>
+                    代理账户
+                </a>
+                <a href="/profit" class="menu-item">
+                    <i class="bi bi-cash-stack"></i>
+                    分润信息
+                </a>
+                <a href="/account-detail" class="menu-item">
+                    <i class="bi bi-list-ul"></i>
+                    账户明细
+                </a>
+                <a href="/statement" class="menu-item">
+                    <i class="bi bi-file-earmark-text"></i>
+                    对账单
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-shuffle"></i>
+                交易管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/channel" class="menu-item">
+                    <i class="bi bi-link-45deg"></i>
+                    通道管理
+                </a>
+                <a href="/transaction" class="menu-item">
+                    <i class="bi bi-bar-chart-line"></i>
+                    交易明细
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <nav class="topbar">
+            <div class="topbar-title" th:text="${pageTitle != null ? pageTitle : '机器信息'}">机器信息</div>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-content">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">首页</a></li>
+                    <li class="breadcrumb-item">产品管理</li>
+                    <li class="breadcrumb-item active">机器信息</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="d-flex flex-wrap gap-3">
+                                <div>
+                                    <label class="form-label small text-muted mb-1">机器编号</label>
+                                    <input type="text" class="form-control form-control-sm" id="search-machineNo" placeholder="请输入机器编号">
+                                </div>
+                                <div>
+                                    <label class="form-label small text-muted mb-1">SN号</label>
+                                    <input type="text" class="form-control form-control-sm" id="search-sn" placeholder="请输入SN号">
+                                </div>
+                                <div>
+                                    <label class="form-label small text-muted mb-1">状态</label>
+                                    <select class="form-select form-select-sm" id="search-machineStatus">
+                                        <option value="">全部</option>
+                                        <option value="1">正常</option>
+                                        <option value="0">停用</option>
+                                    </select>
+                                </div>
+                                <div class="align-self-end">
+                                    <button class="btn btn-primary btn-sm" onclick="searchMachine()">
+                                        <i class="bi bi-search"></i> 查询
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm ms-2" onclick="resetMachineSearch()">
+                                        <i class="bi bi-arrow-repeat"></i> 重置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm" onclick="openMachineModal()">
+                                <i class="bi bi-plus"></i> 新增机器
+                            </button>
+                            <button class="btn btn-info btn-sm ms-2" onclick="openImportModal()">
+                                <i class="bi bi-upload"></i> 批量导入
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>机器编号</th>
+                                    <th>SN号</th>
+                                    <th>产品</th>
+                                    <th>商户</th>
+                                    <th>代理商</th>
+                                    <th>状态</th>
+                                    <th>购买日期</th>
+                                    <th>激活时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="machine-table">
+                                <tr>
+                                    <td colspan="10" class="text-center py-3">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <span class="small text-muted">共 <span id="machine-total">0</span> 条记录</span>
+                        </div>
+                        <div class="col-auto">
+                            <nav id="machine-pagination"></nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="machineModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="machineModalTitle">新增机器</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="machineForm">
+                    <input type="hidden" id="machine-id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">机器编号</label>
+                            <input type="text" class="form-control" id="machine-machineNo" placeholder="系统自动生成">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">SN号 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="machine-sn" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">MAC地址</label>
+                            <input type="text" class="form-control" id="machine-macAddress">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">产品 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="machine-productId">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="machine-status">
+                                <option value="1">正常</option>
+                                <option value="0">停用</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">购买日期</label>
+                            <input type="date" class="form-control" id="machine-purchaseDate">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveMachine()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="bindModal" tabindex="-1">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">绑定商户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="bind-machineId">
+                <div class="mb-3">
+                    <label class="form-label">选择商户</label>
+                    <select class="form-select" id="bind-merchantId">
+                        <option value="">请选择</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="confirmBind()">确认绑定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">批量导入机器</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">选择代理商（可选）</label>
+                    <select class="form-select" id="import-agentId">
+                        <option value="">请选择（不选则为公共机器）</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">上传Excel文件 <span class="text-danger">*</span></label>
+                    <input type="file" class="form-control" id="import-file" accept=".xlsx,.xls">
+                </div>
+                <div class="alert alert-info small">
+                    <i class="bi bi-info-circle"></i> 请使用模板文件导入，包含列：SN号、MAC地址
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="confirmImport()">确认导入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x" style="z-index: 9999; margin-top: 20px;">
+    <div id="toast" class="toast" role="alert">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    let machineCurrentPage = 1;
+    let machinePageSize = 10;
+    let machineModalInstance = null;
+    let bindModalInstance = null;
+    let importModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        machineModalInstance = new bootstrap.Modal(document.getElementById('machineModal'));
+        bindModalInstance = new bootstrap.Modal(document.getElementById('bindModal'));
+        importModalInstance = new bootstrap.Modal(document.getElementById('importModal'));
+        loadMachineList();
+        loadSelectOptions();
+    });
+
+    function loadSelectOptions() {
+        fetch('/machine/api/options')
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const productSelect = document.getElementById('machine-productId');
+                    let html = '<option value="">请选择</option>';
+                    result.data.forEach(p => {
+                        html += `<option value="${p.id}">${p.productName}</option>`;
+                    });
+                    productSelect.innerHTML = html;
+                }
+            });
+
+        fetch('/agent/api/options')
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const agentSelect = document.getElementById('import-agentId');
+                    let html = '<option value="">请选择（不选则为公共机器）</option>';
+                    result.data.forEach(a => {
+                        html += `<option value="${a.id}">${a.agentName}</option>`;
+                    });
+                    agentSelect.innerHTML = html;
+                }
+            });
+    }
+
+    function loadMachineList() {
+        const machineNo = document.getElementById('search-machineNo').value;
+        const sn = document.getElementById('search-sn').value;
+        const status = document.getElementById('search-machineStatus').value;
+
+        let url = `/machine/api/list?pageNum=${machineCurrentPage}&pageSize=${machinePageSize}`;
+        if (machineNo) url += `&machineNo=${encodeURIComponent(machineNo)}`;
+        if (sn) url += `&sn=${encodeURIComponent(sn)}`;
+        if (status) url += `&status=${status}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200) {
+                    renderMachineTable(result.data);
+                    renderMachinePagination(result.total);
+                    document.getElementById('machine-total').textContent = result.total || 0;
+                } else {
+                    showToast('加载失败: ' + (result.msg || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('加载机器列表失败:', error);
+                showToast('加载失败', 'error');
+            });
+    }
+
+    function renderMachineTable(data) {
+        const tbody = document.getElementById('machine-table');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center py-3">暂无数据</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(machine => {
+            const statusBadge = machine.status === 1 ? '<span class="badge bg-success">正常</span>' : '<span class="badge bg-secondary">停用</span>';
+            return `
+                <tr>
+                    <td>${machine.id || '-'}</td>
+                    <td>${escapeHtml(machine.machineNo || '-')}</td>
+                    <td>${escapeHtml(machine.sn || '-')}</td>
+                    <td>${escapeHtml(machine.productName || '-')}</td>
+                    <td>${escapeHtml(machine.merchantName || '未绑定')}</td>
+                    <td>${escapeHtml(machine.agentName || '-')}</td>
+                    <td>${statusBadge}</td>
+                    <td>${machine.purchaseDate || '-'}</td>
+                    <td>${machine.activateTime ? formatDateTime(machine.activateTime) : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editMachine(${machine.id})">
+                            <i class="bi bi-pencil"></i> 编辑
+                        </button>
+                        ${!machine.merchantId ? `<button class="btn btn-sm btn-outline-success" onclick="openBindModal(${machine.id})">
+                            <i class="bi bi-link-45deg"></i> 绑定
+                        </button>` : `<button class="btn btn-sm btn-outline-warning" onclick="unbindMachine(${machine.id})">
+                            <i class="bi bi-link-45deg"></i> 解绑
+                        </button>`}
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteMachine(${machine.id})">
+                            <i class="bi bi-trash"></i> 删除
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderMachinePagination(total) {
+        const totalPages = Math.ceil(total / machinePageSize);
+        const pagination = document.getElementById('machine-pagination');
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let html = '<ul class="pagination pagination-sm mb-0">';
+
+        html += `<li class="page-item ${machineCurrentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToMachinePage(${machineCurrentPage - 1})">上一页</a>
+        </li>`;
+
+        for (let i = 1; i <= totalPages && i <= 10; i++) {
+            html += `<li class="page-item ${i === machineCurrentPage ? 'active' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="goToMachinePage(${i})">${i}</a>
+            </li>`;
+        }
+
+        html += `<li class="page-item ${machineCurrentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToMachinePage(${machineCurrentPage + 1})">下一页</a>
+        </li>`;
+
+        html += '</ul>';
+        pagination.innerHTML = html;
+    }
+
+    function goToMachinePage(page) {
+        machineCurrentPage = page;
+        loadMachineList();
+    }
+
+    function searchMachine() {
+        machineCurrentPage = 1;
+        loadMachineList();
+    }
+
+    function resetMachineSearch() {
+        document.getElementById('search-machineNo').value = '';
+        document.getElementById('search-sn').value = '';
+        document.getElementById('search-machineStatus').value = '';
+        searchMachine();
+    }
+
+    function openMachineModal() {
+        document.getElementById('machineModalTitle').textContent = '新增机器';
+        document.getElementById('machineForm').reset();
+        document.getElementById('machine-id').value = '';
+        document.getElementById('machine-status').value = '1';
+        machineModalInstance.show();
+    }
+
+    function editMachine(id) {
+        fetch(`/machine/api/${id}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const machine = result.data;
+                    document.getElementById('machineModalTitle').textContent = '编辑机器';
+                    document.getElementById('machine-id').value = machine.id;
+                    document.getElementById('machine-machineNo').value = machine.machineNo || '';
+                    document.getElementById('machine-sn').value = machine.sn || '';
+                    document.getElementById('machine-macAddress').value = machine.macAddress || '';
+                    document.getElementById('machine-productId').value = machine.productId || '';
+                    document.getElementById('machine-status').value = machine.status !== null ? machine.status : '1';
+                    document.getElementById('machine-purchaseDate').value = machine.purchaseDate || '';
+
+                    machineModalInstance.show();
+                } else {
+                    showToast('获取机器信息失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('获取机器信息失败:', error);
+                showToast('获取机器信息失败', 'error');
+            });
+    }
+
+    function saveMachine() {
+        const id = document.getElementById('machine-id').value;
+        const sn = document.getElementById('machine-sn').value.trim();
+        const productIdValue = document.getElementById('machine-productId').value;
+
+        if (!sn) {
+            showToast('请输入SN号', 'error');
+            return;
+        }
+
+        if (!productIdValue) {
+            showToast('请选择产品', 'error');
+            return;
+        }
+
+        const data = {
+            sn: sn,
+            productId: parseInt(productIdValue),
+            status: parseInt(document.getElementById('machine-status').value)
+        };
+
+        const macAddress = document.getElementById('machine-macAddress').value.trim();
+        const purchaseDate = document.getElementById('machine-purchaseDate').value;
+
+        if (macAddress) data.macAddress = macAddress;
+        if (purchaseDate) data.purchaseDate = purchaseDate;
+
+        let url = '/machine/api/add';
+        if (id) {
+            url = '/machine/api/update';
+            data.id = parseInt(id);
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast(id ? '更新成功' : '添加成功', 'success');
+                machineModalInstance.hide();
+                loadMachineList();
+            } else {
+                showToast(result.msg || '操作失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('保存机器失败:', error);
+            showToast('保存失败', 'error');
+        });
+    }
+
+    function deleteMachine(id) {
+        if (!confirm('确定要删除该机器吗？')) {
+            return;
+        }
+
+        fetch(`/machine/api/delete/${id}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast('删除成功', 'success');
+                loadMachineList();
+            } else {
+                showToast(result.msg || '删除失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('删除机器失败:', error);
+            showToast('删除失败', 'error');
+        });
+    }
+
+    function openBindModal(machineId) {
+        document.getElementById('bind-machineId').value = machineId;
+        document.getElementById('bind-merchantId').innerHTML = '<option value="">加载中...</option>';
+
+        fetch('/agent/api/options')
+            .then(response => response.json())
+            .then(result => {
+                let merchantHtml = '<option value="">请选择商户</option>';
+                
+                const agentSelect = document.getElementById('import-agentId');
+                const agents = result.data || [];
+                
+                const merchantPromises = agents.map(agent => {
+                    return fetch(`/merchant/api/by-agent/${agent.id}`)
+                        .then(r => r.json())
+                        .then(m => {
+                            if (m.code === 200 && m.data) {
+                                return { agentId: agent.id, agentName: agent.agentName, merchants: m.data };
+                            }
+                            return { agentId: agent.id, agentName: agent.agentName, merchants: [] };
+                        });
+                });
+
+                Promise.all(merchantPromises)
+                    .then(allMerchants => {
+                        allMerchants.forEach(group => {
+                            if (group.merchants.length > 0) {
+                                merchantHtml += `<optgroup label="${group.agentName}">`;
+                                group.merchants.forEach(merchant => {
+                                    merchantHtml += `<option value="${merchant.id}">${merchant.merchantName}</option>`;
+                                });
+                                merchantHtml += '</optgroup>';
+                            }
+                        });
+                        document.getElementById('bind-merchantId').innerHTML = merchantHtml;
+                    });
+            });
+
+        bindModalInstance.show();
+    }
+
+    function confirmBind() {
+        const machineId = document.getElementById('bind-machineId').value;
+        const merchantId = document.getElementById('bind-merchantId').value;
+
+        if (!merchantId) {
+            showToast('请选择商户', 'error');
+            return;
+        }
+
+        fetch(`/machine/api/bind/${machineId}/${merchantId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast('绑定成功', 'success');
+                bindModalInstance.hide();
+                loadMachineList();
+            } else {
+                showToast(result.msg || '绑定失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('绑定失败:', error);
+            showToast('绑定失败', 'error');
+        });
+    }
+
+    function unbindMachine(machineId) {
+        if (!confirm('确定要解绑该机器吗？')) {
+            return;
+        }
+
+        fetch(`/machine/api/unbind/${machineId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast('解绑成功', 'success');
+                loadMachineList();
+            } else {
+                showToast(result.msg || '解绑失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('解绑失败:', error);
+            showToast('解绑失败', 'error');
+        });
+    }
+
+    function openImportModal() {
+        document.getElementById('import-file').value = '';
+        document.getElementById('import-agentId').value = '';
+        importModalInstance.show();
+    }
+
+    function confirmImport() {
+        const file = document.getElementById('import-file').files[0];
+        const agentId = document.getElementById('import-agentId').value;
+
+        if (!file) {
+            showToast('请选择上传文件', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        if (agentId) {
+            formData.append('agentId', agentId);
+        }
+
+        showLoading();
+        fetch('/machine/api/import', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            hideLoading();
+            if (result.code === 200) {
+                showToast(`导入成功：成功 ${result.data.success || 0} 条，失败 ${result.data.failed || 0} 条`, 'success');
+                importModalInstance.hide();
+                loadMachineList();
+            } else {
+                showToast(result.msg || '导入失败', 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('导入失败:', error);
+            showToast('导入失败', 'error');
+        });
+    }
+</script>
+</body>
+</html>

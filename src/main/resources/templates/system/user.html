@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - 后台管理系统'">后台管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <div class="sidebar-brand">
+            <a href="/">
+                <i class="bi bi-gear-wide-connected"></i>
+                后台管理系统
+            </a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item">
+                <i class="bi bi-house-door"></i>
+                首页
+            </a>
+
+            <a href="javascript:void(0)" class="menu-item active" onclick="toggleMenu(this)">
+                <i class="bi bi-gear"></i>
+                系统管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu open">
+                <a href="/system/user" class="menu-item active">
+                    <i class="bi bi-person-circle"></i>
+                    系统用户管理
+                </a>
+                <a href="/system/role" class="menu-item">
+                    <i class="bi bi-people-fill"></i>
+                    角色管理
+                </a>
+                <a href="/system/permission" class="menu-item">
+                    <i class="bi bi-key-fill"></i>
+                    权限管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-person-badge"></i>
+                用户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent" class="menu-item">
+                    <i class="bi bi-building"></i>
+                    代理商管理
+                </a>
+                <a href="/merchant" class="menu-item">
+                    <i class="bi bi-shop"></i>
+                    商户管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-box-seam"></i>
+                产品管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/product" class="menu-item">
+                    <i class="bi bi-box"></i>
+                    产品信息
+                </a>
+                <a href="/machine" class="menu-item">
+                    <i class="bi bi-hdd"></i>
+                    机器信息
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-wallet2"></i>
+                账户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent-account" class="menu-item">
+                    <i class="bi bi-credit-card"></i>
+                    代理账户
+                </a>
+                <a href="/profit" class="menu-item">
+                    <i class="bi bi-cash-stack"></i>
+                    分润信息
+                </a>
+                <a href="/account-detail" class="menu-item">
+                    <i class="bi bi-list-ul"></i>
+                    账户明细
+                </a>
+                <a href="/statement" class="menu-item">
+                    <i class="bi bi-file-earmark-text"></i>
+                    对账单
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-shuffle"></i>
+                交易管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/channel" class="menu-item">
+                    <i class="bi bi-link-45deg"></i>
+                    通道管理
+                </a>
+                <a href="/transaction" class="menu-item">
+                    <i class="bi bi-bar-chart-line"></i>
+                    交易明细
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <nav class="topbar">
+            <div class="topbar-title" th:text="${pageTitle}">系统用户管理</div>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-content">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">首页</a></li>
+                    <li class="breadcrumb-item">系统管理</li>
+                    <li class="breadcrumb-item active">系统用户管理</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="d-flex flex-wrap gap-3">
+                                <div>
+                                    <label class="form-label small text-muted mb-1">用户名</label>
+                                    <input type="text" class="form-control form-control-sm" id="search-username" placeholder="请输入用户名">
+                                </div>
+                                <div>
+                                    <label class="form-label small text-muted mb-1">状态</label>
+                                    <select class="form-select form-select-sm" id="search-status">
+                                        <option value="">全部</option>
+                                        <option value="1">启用</option>
+                                        <option value="0">禁用</option>
+                                    </select>
+                                </div>
+                                <div class="align-self-end">
+                                    <button class="btn btn-primary btn-sm" onclick="searchSystemUser()">
+                                        <i class="bi bi-search"></i> 查询
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm ms-2" onclick="resetSystemUserSearch()">
+                                        <i class="bi bi-arrow-repeat"></i> 重置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm" onclick="openSystemUserModal()">
+                                <i class="bi bi-plus"></i> 新增用户
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>用户名</th>
+                                    <th>姓名</th>
+                                    <th>手机号</th>
+                                    <th>邮箱</th>
+                                    <th>角色</th>
+                                    <th>关联代理</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="system-user-table">
+                                <tr>
+                                    <td colspan="10" class="text-center py-3">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <span class="small text-muted">共 <span id="system-user-total">0</span> 条记录</span>
+                        </div>
+                        <div class="col-auto">
+                            <nav id="system-user-pagination"></nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="systemUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="systemUserModalTitle">新增用户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="systemUserForm">
+                    <input type="hidden" id="system-user-id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">用户名 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="system-user-username" required>
+                        </div>
+                        <div class="col-md-6 mb-3" id="system-user-password-group">
+                            <label class="form-label">密码 <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="system-user-password" placeholder="至少6位">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">姓名</label>
+                            <input type="text" class="form-control" id="system-user-realName">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">手机号</label>
+                            <input type="text" class="form-control" id="system-user-phone">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">邮箱</label>
+                            <input type="email" class="form-control" id="system-user-email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="system-user-status">
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">关联代理</label>
+                            <select class="form-select" id="system-user-agentId">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">角色 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="system-user-roleId">
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveSystemUser()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="resetPasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">重置密码</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="resetPasswordForm">
+                    <input type="hidden" id="reset-password-userId">
+                    <div class="mb-3">
+                        <label class="form-label">新密码 <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="reset-password-newPassword" placeholder="至少6位">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">确认密码 <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="reset-password-confirmPassword" placeholder="请再次输入">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-warning" onclick="confirmResetPassword()">确认重置</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x" style="z-index: 9999; margin-top: 20px;">
+    <div id="toast" class="toast" role="alert">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    let systemUserCurrentPage = 1;
+    let systemUserPageSize = 10;
+    let systemUserModalInstance = null;
+    let resetPasswordModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        systemUserModalInstance = new bootstrap.Modal(document.getElementById('systemUserModal'));
+        resetPasswordModalInstance = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
+        loadSystemUserFormData();
+        loadSystemUserList();
+    });
+
+    function loadSystemUserFormData() {
+        fetch('/system/user/api/form-data')
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const data = result.data;
+                    
+                    const agentSelect = document.getElementById('system-user-agentId');
+                    agentSelect.innerHTML = '<option value="">请选择</option>';
+                    if (data.agents) {
+                        data.agents.forEach(agent => {
+                            agentSelect.innerHTML += `<option value="${agent.id}">${agent.agentName}</option>`;
+                        });
+                    }
+
+                    const roleSelect = document.getElementById('system-user-roleId');
+                    roleSelect.innerHTML = '<option value="">请选择角色</option>';
+                    if (data.roles) {
+                        data.roles.forEach(role => {
+                            roleSelect.innerHTML += `<option value="${role.id}">${role.roleName}</option>`;
+                        });
+                    }
+                }
+            });
+    }
+
+    function loadSystemUserList() {
+        const username = document.getElementById('search-username').value;
+        const status = document.getElementById('search-status').value;
+
+        let url = `/system/user/api/list?pageNum=${systemUserCurrentPage}&pageSize=${systemUserPageSize}`;
+        if (username) url += `&username=${encodeURIComponent(username)}`;
+        if (status) url += `&status=${status}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200) {
+                    renderSystemUserTable(result.data);
+                    renderSystemUserPagination(result.total);
+                    document.getElementById('system-user-total').textContent = result.total || 0;
+                } else {
+                    showToast('加载失败: ' + (result.msg || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('加载系统用户列表失败:', error);
+                showToast('加载失败', 'error');
+            });
+    }
+
+    function renderSystemUserTable(data) {
+        const tbody = document.getElementById('system-user-table');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center py-3">暂无数据</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(user => {
+            const roles = user.roles || [];
+            const roleNames = roles.map(r => r.roleName).join(', ') || '-';
+            const agentName = user.agentName || '-';
+            return `
+                <tr>
+                    <td>${user.id || '-'}</td>
+                    <td>${escapeHtml(user.username)}</td>
+                    <td>${escapeHtml(user.realName || '-')}</td>
+                    <td>${escapeHtml(user.phone || '-')}</td>
+                    <td>${escapeHtml(user.email || '-')}</td>
+                    <td>${escapeHtml(roleNames)}</td>
+                    <td>${escapeHtml(agentName)}</td>
+                    <td>${getStatusBadge(user.status)}</td>
+                    <td>${user.createTime ? formatDateTime(user.createTime) : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editSystemUser(${user.id})">
+                            <i class="bi bi-pencil"></i> 编辑
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="openResetPasswordModal(${user.id})">
+                            <i class="bi bi-key"></i> 重置密码
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteSystemUser(${user.id})">
+                            <i class="bi bi-trash"></i> 删除
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderSystemUserPagination(total) {
+        const totalPages = Math.ceil(total / systemUserPageSize);
+        const pagination = document.getElementById('system-user-pagination');
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let html = '<ul class="pagination pagination-sm mb-0">';
+
+        html += `<li class="page-item ${systemUserCurrentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToSystemUserPage(${systemUserCurrentPage - 1})">上一页</a>
+        </li>`;
+
+        for (let i = 1; i <= totalPages && i <= 10; i++) {
+            html += `<li class="page-item ${i === systemUserCurrentPage ? 'active' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="goToSystemUserPage(${i})">${i}</a>
+            </li>`;
+        }
+
+        html += `<li class="page-item ${systemUserCurrentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToSystemUserPage(${systemUserCurrentPage + 1})">下一页</a>
+        </li>`;
+
+        html += '</ul>';
+        pagination.innerHTML = html;
+    }
+
+    function goToSystemUserPage(page) {
+        systemUserCurrentPage = page;
+        loadSystemUserList();
+    }
+
+    function searchSystemUser() {
+        systemUserCurrentPage = 1;
+        loadSystemUserList();
+    }
+
+    function resetSystemUserSearch() {
+        document.getElementById('search-username').value = '';
+        document.getElementById('search-status').value = '';
+        searchSystemUser();
+    }
+
+    function openSystemUserModal() {
+        document.getElementById('systemUserModalTitle').textContent = '新增用户';
+        document.getElementById('system-user-password-group').style.display = 'block';
+        document.getElementById('systemUserForm').reset();
+        document.getElementById('system-user-id').value = '';
+        document.getElementById('system-user-status').value = '1';
+        systemUserModalInstance.show();
+    }
+
+    function editSystemUser(id) {
+        fetch(`/system/user/api/${id}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const user = result.data;
+                    document.getElementById('systemUserModalTitle').textContent = '编辑用户';
+                    document.getElementById('system-user-password-group').style.display = 'none';
+                    document.getElementById('system-user-id').value = user.id;
+                    document.getElementById('system-user-username').value = user.username || '';
+                    document.getElementById('system-user-realName').value = user.realName || '';
+                    document.getElementById('system-user-phone').value = user.phone || '';
+                    document.getElementById('system-user-email').value = user.email || '';
+                    document.getElementById('system-user-status').value = user.status !== null ? user.status : '1';
+                    
+                    if (user.agentId) {
+                        document.getElementById('system-user-agentId').value = user.agentId;
+                    } else {
+                        document.getElementById('system-user-agentId').value = '';
+                    }
+
+                    const roleId = user.roles && user.roles.length > 0 ? user.roles[0].id : null;
+                    const roleSelect = document.getElementById('system-user-roleId');
+                    if (roleId) {
+                        for (let option of roleSelect.options) {
+                            option.selected = parseInt(option.value) === roleId;
+                        }
+                    }
+
+                    systemUserModalInstance.show();
+                } else {
+                    showToast('获取用户信息失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('获取用户信息失败:', error);
+                showToast('获取用户信息失败', 'error');
+            });
+    }
+
+    function saveSystemUser() {
+        const id = document.getElementById('system-user-id').value;
+        const username = document.getElementById('system-user-username').value.trim();
+        const password = document.getElementById('system-user-password').value;
+        const realName = document.getElementById('system-user-realName').value.trim();
+        const phone = document.getElementById('system-user-phone').value.trim();
+        const email = document.getElementById('system-user-email').value.trim();
+        const status = parseInt(document.getElementById('system-user-status').value);
+        const agentIdValue = document.getElementById('system-user-agentId').value;
+        const agentId = agentIdValue ? parseInt(agentIdValue) : null;
+
+        const roleSelect = document.getElementById('system-user-roleId');
+        const roleId = roleSelect.value ? parseInt(roleSelect.value) : null;
+        const roleIds = roleId ? [roleId] : [];
+
+        if (!username) {
+            showToast('请输入用户名', 'error');
+            return;
+        }
+
+        if (!roleId) {
+            showToast('请选择角色', 'error');
+            return;
+        }
+
+        if (!realName) {
+            showToast('请输入姓名', 'error');
+            return;
+        }
+
+        if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
+            showToast('请输入正确的手机号格式', 'error');
+            return;
+        }
+
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showToast('请输入正确的邮箱格式', 'error');
+            return;
+        }
+
+        const data = {
+            username: username,
+            realName: realName,
+            phone: phone,
+            email: email,
+            status: status,
+            roleIds: roleIds
+        };
+
+        if (agentId !== null) {
+            data.agentId = agentId;
+        }
+
+        let url = '/system/user/api/add';
+        if (id) {
+            url = '/system/user/api/update';
+            data.id = parseInt(id);
+        } else {
+            data.password = password;
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast(id ? '更新成功' : '添加成功', 'success');
+                systemUserModalInstance.hide();
+                loadSystemUserList();
+            } else {
+                showToast(result.msg || '操作失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('保存用户失败:', error);
+            showToast('保存失败', 'error');
+        });
+    }
+
+    function deleteSystemUser(id) {
+        if (!confirm('确定要删除该用户吗？')) {
+            return;
+        }
+
+        fetch(`/system/user/api/delete/${id}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast('删除成功', 'success');
+                loadSystemUserList();
+            } else {
+                showToast(result.msg || '删除失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('删除用户失败:', error);
+            showToast('删除失败', 'error');
+        });
+    }
+
+    function openResetPasswordModal(userId) {
+        document.getElementById('reset-password-userId').value = userId;
+        document.getElementById('reset-password-newPassword').value = '';
+        document.getElementById('reset-password-confirmPassword').value = '';
+        resetPasswordModalInstance.show();
+    }
+
+    function confirmResetPassword() {
+        const userId = document.getElementById('reset-password-userId').value;
+        const newPassword = document.getElementById('reset-password-newPassword').value;
+        const confirmPassword = document.getElementById('reset-password-confirmPassword').value;
+
+        if (!newPassword || newPassword.length < 6) {
+            showToast('密码长度至少6位', 'error');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showToast('两次密码输入不一致', 'error');
+            return;
+        }
+
+        fetch(`/system/user/api/reset-password/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ newPassword: newPassword })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast('密码重置成功', 'success');
+                resetPasswordModalInstance.hide();
+            } else {
+                showToast(result.msg || '重置失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('重置密码失败:', error);
+            showToast('重置失败', 'error');
+        });
+    }
+</script>
+</body>
+</html>

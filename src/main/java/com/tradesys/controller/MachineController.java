@@ -3,9 +3,14 @@ package com.tradesys.controller;
 import com.tradesys.common.PageQuery;
 import com.tradesys.common.Result;
 import com.tradesys.entity.Machine;
+import com.tradesys.entity.SysRole;
+import com.tradesys.entity.SysUser;
 import com.tradesys.service.MachineService;
+import com.tradesys.service.SysUserService;
+import com.tradesys.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,10 +24,28 @@ import java.util.Map;
 public class MachineController {
 
     private final MachineService machineService;
+    private final SysUserService sysUserService;
 
     @GetMapping
-    public String list() {
-        return "product/machine";
+    public String list(Model model) {
+        addUserInfoToModel(model);
+        model.addAttribute("pageTitle", "机器信息");
+        model.addAttribute("activeMenu", "machine");
+        return "machine";
+    }
+
+    private void addUserInfoToModel(Model model) {
+        String username = SecurityUtils.getUsername();
+        if (username != null) {
+            SysUser user = sysUserService.getByUsername(username);
+            if (user != null) {
+                model.addAttribute("currentUser", user);
+                List<SysRole> roles = sysUserService.getUserRoles(user.getId());
+                if (roles != null && !roles.isEmpty()) {
+                    model.addAttribute("currentRole", roles.get(0).getRoleName());
+                }
+            }
+        }
     }
 
     @GetMapping("/api/list")

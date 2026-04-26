@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - 后台管理系统' : '后台管理系统'}">后台管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <div class="sidebar-brand">
+            <a href="/">
+                <i class="bi bi-gear-wide-connected"></i>
+                后台管理系统
+            </a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item">
+                <i class="bi bi-house-door"></i>
+                首页
+            </a>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-gear"></i>
+                系统管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/system/user" class="menu-item">
+                    <i class="bi bi-person-circle"></i>
+                    系统用户管理
+                </a>
+                <a href="/system/role" class="menu-item">
+                    <i class="bi bi-people-fill"></i>
+                    角色管理
+                </a>
+                <a href="/system/permission" class="menu-item">
+                    <i class="bi bi-key-fill"></i>
+                    权限管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-person-badge"></i>
+                用户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent" class="menu-item">
+                    <i class="bi bi-building"></i>
+                    代理商管理
+                </a>
+                <a href="/merchant" class="menu-item">
+                    <i class="bi bi-shop"></i>
+                    商户管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-box-seam"></i>
+                产品管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/product" class="menu-item">
+                    <i class="bi bi-box"></i>
+                    产品信息
+                </a>
+                <a href="/machine" class="menu-item">
+                    <i class="bi bi-hdd"></i>
+                    机器信息
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item active" onclick="toggleMenu(this)">
+                <i class="bi bi-wallet2"></i>
+                账户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu open">
+                <a href="/agent-account" class="menu-item">
+                    <i class="bi bi-credit-card"></i>
+                    代理账户
+                </a>
+                <a href="/profit" class="menu-item">
+                    <i class="bi bi-cash-stack"></i>
+                    分润信息
+                </a>
+                <a href="/account-detail" class="menu-item active">
+                    <i class="bi bi-list-ul"></i>
+                    账户明细
+                </a>
+                <a href="/statement" class="menu-item">
+                    <i class="bi bi-file-earmark-text"></i>
+                    对账单
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-shuffle"></i>
+                交易管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/channel" class="menu-item">
+                    <i class="bi bi-link-45deg"></i>
+                    通道管理
+                </a>
+                <a href="/transaction" class="menu-item">
+                    <i class="bi bi-bar-chart-line"></i>
+                    交易明细
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <nav class="topbar">
+            <div class="topbar-title" th:text="${pageTitle != null ? pageTitle : '账户明细'}">账户明细</div>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-content">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">首页</a></li>
+                    <li class="breadcrumb-item">账户管理</li>
+                    <li class="breadcrumb-item active">账户明细</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="d-flex flex-wrap gap-3">
+                                <div>
+                                    <label class="form-label small text-muted mb-1">开始日期</label>
+                                    <input type="date" class="form-control form-control-sm" id="search-detail-startDate">
+                                </div>
+                                <div>
+                                    <label class="form-label small text-muted mb-1">结束日期</label>
+                                    <input type="date" class="form-control form-control-sm" id="search-detail-endDate">
+                                </div>
+                                <div>
+                                    <label class="form-label small text-muted mb-1">代理商</label>
+                                    <input type="text" class="form-control form-control-sm" id="search-detail-agentName" placeholder="请输入代理商名称">
+                                </div>
+                                <div>
+                                    <label class="form-label small text-muted mb-1">类型</label>
+                                    <select class="form-select form-select-sm" id="search-detail-type">
+                                        <option value="">全部</option>
+                                        <option value="1">收入</option>
+                                        <option value="2">支出</option>
+                                    </select>
+                                </div>
+                                <div class="align-self-end">
+                                    <button class="btn btn-primary btn-sm" onclick="searchAccountDetail()">
+                                        <i class="bi bi-search"></i> 查询
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm ms-2" onclick="resetAccountDetailSearch()">
+                                        <i class="bi bi-arrow-repeat"></i> 重置
+                                    </button>
+                                    <button class="btn btn-success btn-sm ms-2" onclick="exportAccountDetail()">
+                                        <i class="bi bi-file-earmark-excel"></i> 导出
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>时间</th>
+                                    <th>代理商</th>
+                                    <th>类型</th>
+                                    <th>金额</th>
+                                    <th>余额</th>
+                                    <th>描述</th>
+                                </tr>
+                            </thead>
+                            <tbody id="account-detail-table">
+                                <tr>
+                                    <td colspan="6" class="text-center py-3">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <span class="small text-muted">共 <span id="account-detail-total">0</span> 条记录</span>
+                        </div>
+                        <div class="col-auto">
+                            <nav id="account-detail-pagination"></nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x" style="z-index: 9999; margin-top: 20px;">
+    <div id="toast" class="toast" role="alert">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    let accountDetailCurrentPage = 1;
+    let accountDetailPageSize = 10;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAccountDetailList();
+    });
+
+    function loadAccountDetailList() {
+        const startDate = document.getElementById('search-detail-startDate').value;
+        const endDate = document.getElementById('search-detail-endDate').value;
+        const agentName = document.getElementById('search-detail-agentName').value;
+        const type = document.getElementById('search-detail-type').value;
+
+        let url = `/account-detail/api/list?pageNum=${accountDetailCurrentPage}&pageSize=${accountDetailPageSize}`;
+        if (startDate) url += `&startDate=${encodeURIComponent(startDate)}`;
+        if (endDate) url += `&endDate=${encodeURIComponent(endDate)}`;
+        if (agentName) url += `&agentName=${encodeURIComponent(agentName)}`;
+        if (type) url += `&type=${type}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200) {
+                    renderAccountDetailTable(result.data);
+                    renderAccountDetailPagination(result.total);
+                    document.getElementById('account-detail-total').textContent = result.total || 0;
+                } else {
+                    showToast('加载失败: ' + (result.msg || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('加载账户明细列表失败:', error);
+                showToast('加载失败', 'error');
+            });
+    }
+
+    function renderAccountDetailTable(data) {
+        const tbody = document.getElementById('account-detail-table');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-3">暂无数据</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(detail => {
+            const typeBadge = detail.type === 1 
+                ? '<span class="badge bg-success">收入</span>' 
+                : '<span class="badge bg-danger">支出</span>';
+            const amountClass = detail.type === 1 ? 'text-success' : 'text-danger';
+            const amountPrefix = detail.type === 1 ? '+' : '-';
+            return `
+                <tr>
+                    <td>${detail.createTime ? formatDateTime(detail.createTime) : '-'}</td>
+                    <td>${escapeHtml(detail.agentName || '-')}</td>
+                    <td>${typeBadge}</td>
+                    <td class="${amountClass}">${amountPrefix}¥${detail.amount || '0.00'}</td>
+                    <td>¥${detail.balance || '0.00'}</td>
+                    <td>${escapeHtml(detail.description || '-')}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderAccountDetailPagination(total) {
+        const totalPages = Math.ceil(total / accountDetailPageSize);
+        const pagination = document.getElementById('account-detail-pagination');
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let html = '<ul class="pagination pagination-sm mb-0">';
+
+        html += `<li class="page-item ${accountDetailCurrentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToAccountDetailPage(${accountDetailCurrentPage - 1})">上一页</a>
+        </li>`;
+
+        for (let i = 1; i <= totalPages && i <= 10; i++) {
+            html += `<li class="page-item ${i === accountDetailCurrentPage ? 'active' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="goToAccountDetailPage(${i})">${i}</a>
+            </li>`;
+        }
+
+        html += `<li class="page-item ${accountDetailCurrentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToAccountDetailPage(${accountDetailCurrentPage + 1})">下一页</a>
+        </li>`;
+
+        html += '</ul>';
+        pagination.innerHTML = html;
+    }
+
+    function goToAccountDetailPage(page) {
+        accountDetailCurrentPage = page;
+        loadAccountDetailList();
+    }
+
+    function searchAccountDetail() {
+        accountDetailCurrentPage = 1;
+        loadAccountDetailList();
+    }
+
+    function resetAccountDetailSearch() {
+        document.getElementById('search-detail-startDate').value = '';
+        document.getElementById('search-detail-endDate').value = '';
+        document.getElementById('search-detail-agentName').value = '';
+        document.getElementById('search-detail-type').value = '';
+        searchAccountDetail();
+    }
+
+    function exportAccountDetail() {
+        const startDate = document.getElementById('search-detail-startDate').value;
+        const endDate = document.getElementById('search-detail-endDate').value;
+        const agentName = document.getElementById('search-detail-agentName').value;
+        const type = document.getElementById('search-detail-type').value;
+
+        let url = '/account-detail/api/export?';
+        if (startDate) url += `startDate=${encodeURIComponent(startDate)}&`;
+        if (endDate) url += `endDate=${encodeURIComponent(endDate)}&`;
+        if (agentName) url += `agentName=${encodeURIComponent(agentName)}&`;
+        if (type) url += `type=${type}&`;
+
+        window.location.href = url;
+    }
+</script>
+</body>
+</html>

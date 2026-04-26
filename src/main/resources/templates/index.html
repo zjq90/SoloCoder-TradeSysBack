@@ -1,479 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>后台管理系统</title>
+    <title th:text="${pageTitle} + ' - 后台管理系统'">后台管理系统</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #4e73df;
-            --secondary-color: #858796;
-            --success-color: #1cc88a;
-            --info-color: #36b9cc;
-            --warning-color: #f6c23e;
-            --danger-color: #e74a3b;
-            --sidebar-width: 250px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f8f9fc;
-        }
-
-        #wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        #sidebar-wrapper {
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, #4e73df 0%, #224abe 100%);
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar-brand {
-            padding: 1.5rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .sidebar-brand a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .sidebar-brand i {
-            margin-right: 0.5rem;
-        }
-
-        .sidebar-menu {
-            padding: 1rem 0;
-        }
-
-        .menu-item {
-            display: block;
-            padding: 0.85rem 1.5rem;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .menu-item:hover, .menu-item.active {
-            color: #fff;
-            background-color: rgba(255,255,255,0.1);
-        }
-
-        .menu-item i {
-            width: 1.5rem;
-            margin-right: 0.5rem;
-        }
-
-        .menu-item .arrow {
-            float: right;
-            transition: transform 0.3s;
-        }
-
-        .menu-item.expanded .arrow {
-            transform: rotate(180deg);
-        }
-
-        .submenu {
-            background-color: rgba(0,0,0,0.1);
-            display: none;
-        }
-
-        .submenu.show {
-            display: block;
-        }
-
-        .submenu .menu-item {
-            padding-left: 3.5rem;
-            font-size: 0.9rem;
-        }
-
-        #content-wrapper {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .topbar {
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            padding: 0.75rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .topbar-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #5a5c69;
-        }
-
-        .topbar-user {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #5a5c69;
-        }
-
-        .topbar-user .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        #page-content {
-            padding: 1.5rem;
-            flex: 1;
-        }
-
-        .card {
-            border: none;
-            border-radius: 0.35rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        }
-
-        .card-header {
-            background-color: #f8f9fc;
-            border-bottom: 1px solid #e3e6f0;
-            font-weight: 600;
-            color: #5a5c69;
-        }
-
-        .stat-card {
-            border-left: 0.25rem solid;
-        }
-
-        .stat-card.primary {
-            border-left-color: var(--primary-color);
-        }
-
-        .stat-card.success {
-            border-left-color: var(--success-color);
-        }
-
-        .stat-card.info {
-            border-left-color: var(--info-color);
-        }
-
-        .stat-card.warning {
-            border-left-color: var(--warning-color);
-        }
-
-        .stat-card .stat-icon {
-            font-size: 2rem;
-            color: #dddfeb;
-        }
-
-        .stat-card .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #5a5c69;
-        }
-
-        .stat-card .stat-label {
-            font-size: 0.85rem;
-            color: #858796;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .stat-card .stat-change {
-            font-size: 0.8rem;
-        }
-
-        .stat-change.up {
-            color: var(--success-color);
-        }
-
-        .stat-change.down {
-            color: var(--danger-color);
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        .table thead th {
-            background-color: #f8f9fc;
-            border-bottom: 2px solid #e3e6f0;
-            font-weight: 600;
-            color: #5a5c69;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-        }
-
-        .table tbody td {
-            color: #5a5c69;
-            vertical-align: middle;
-        }
-
-        .btn {
-            border-radius: 0.35rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 0.4rem 0.8rem;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .btn-primary:hover {
-            background-color: #224abe;
-            border-color: #224abe;
-        }
-
-        .btn-success {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
-        }
-
-        .btn-info {
-            background-color: var(--info-color);
-            border-color: var(--info-color);
-        }
-
-        .btn-warning {
-            background-color: var(--warning-color);
-            border-color: var(--warning-color);
-        }
-
-        .btn-danger {
-            background-color: var(--danger-color);
-            border-color: var(--danger-color);
-        }
-
-        .badge {
-            font-size: 0.75rem;
-            padding: 0.4rem 0.6rem;
-        }
-
-        .badge-success {
-            background-color: var(--success-color);
-        }
-
-        .badge-danger {
-            background-color: var(--danger-color);
-        }
-
-        .badge-warning {
-            background-color: var(--warning-color);
-            color: #5a5c69;
-        }
-
-        .badge-info {
-            background-color: var(--info-color);
-        }
-
-        .badge-secondary {
-            background-color: var(--secondary-color);
-        }
-
-        .modal-content {
-            border: none;
-            border-radius: 0.35rem;
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-        }
-
-        .modal-header {
-            background-color: #f8f9fc;
-            border-bottom: 1px solid #e3e6f0;
-        }
-
-        .modal-title {
-            font-weight: 600;
-            color: #5a5c69;
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #5a5c69;
-            font-size: 0.85rem;
-        }
-
-        .form-control, .form-select {
-            border: 1px solid #d1d3e2;
-            border-radius: 0.35rem;
-            font-size: 0.85rem;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-        }
-
-        .pagination {
-            margin-bottom: 0;
-        }
-
-        .page-link {
-            color: var(--primary-color);
-            font-size: 0.85rem;
-        }
-
-        .page-item.active .page-link {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .breadcrumb {
-            background: transparent;
-            padding: 0;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-        }
-
-        .breadcrumb a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .breadcrumb-item.active {
-            color: #858796;
-        }
-
-        .tree-item {
-            padding: 0.75rem;
-            border-left: 2px solid #e3e6f0;
-            margin-left: 1rem;
-            position: relative;
-        }
-
-        .tree-item::before {
-            content: '';
-            position: absolute;
-            left: -2px;
-            top: 1.5rem;
-            width: 1rem;
-            border-bottom: 2px solid #e3e6f0;
-        }
-
-        .tree-item:last-child {
-            border-left: 2px solid transparent;
-        }
-
-        .tree-item:last-child::before {
-            border-left: 2px solid #e3e6f0;
-            height: 1rem;
-            top: 0;
-        }
-
-        .loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.8);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .loading.show {
-            display: flex;
-        }
-
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 9999;
-        }
-
-        .toast {
-            min-width: 300px;
-            box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .search-box .form-control, .search-box .form-select {
-            max-width: 200px;
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 0.25rem;
-            flex-wrap: wrap;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #858796;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #dddfeb;
-        }
-
-        @media (max-width: 768px) {
-            #sidebar-wrapper {
-                margin-left: calc(-1 * var(--sidebar-width));
-            }
-
-            #sidebar-wrapper.show {
-                margin-left: 0;
-            }
-
-            #content-wrapper {
-                margin-left: 0;
-            }
-        }
-    </style>
+    <link th:href="@{/css/common.css}" rel="stylesheet">
 </head>
 <body>
 <div id="wrapper">
-    <!-- Sidebar -->
     <div id="sidebar-wrapper">
         <div class="sidebar-brand">
             <a href="/">
@@ -482,7 +18,7 @@
             </a>
         </div>
         <div class="sidebar-menu">
-            <a href="javascript:void(0)" class="menu-item active" data-route="dashboard">
+            <a href="/" class="menu-item active">
                 <i class="bi bi-house-door"></i>
                 首页
             </a>
@@ -493,16 +29,16 @@
                 <i class="bi bi-chevron-down arrow"></i>
             </a>
             <div class="submenu">
-                <a href="javascript:void(0)" class="menu-item" data-route="system-user">
+                <a href="/system/user" class="menu-item">
                     <i class="bi bi-person-circle"></i>
                     系统用户管理
                 </a>
-                <a href="javascript:void(0)" class="menu-item" data-route="system-role">
-                    <i class="bi bi-people"></i>
+                <a href="/system/role" class="menu-item">
+                    <i class="bi bi-people-fill"></i>
                     角色管理
                 </a>
-                <a href="javascript:void(0)" class="menu-item" data-route="system-permission">
-                    <i class="bi bi-key"></i>
+                <a href="/system/permission" class="menu-item">
+                    <i class="bi bi-key-fill"></i>
                     权限管理
                 </a>
             </div>
@@ -513,11 +49,11 @@
                 <i class="bi bi-chevron-down arrow"></i>
             </a>
             <div class="submenu">
-                <a href="javascript:void(0)" class="menu-item" data-route="agent">
+                <a href="/agent" class="menu-item">
                     <i class="bi bi-building"></i>
                     代理商管理
                 </a>
-                <a href="javascript:void(0)" class="menu-item" data-route="merchant">
+                <a href="/merchant" class="menu-item">
                     <i class="bi bi-shop"></i>
                     商户管理
                 </a>
@@ -529,11 +65,11 @@
                 <i class="bi bi-chevron-down arrow"></i>
             </a>
             <div class="submenu">
-                <a href="javascript:void(0)" class="menu-item" data-route="product">
-                    <i class="bi bi-cube"></i>
+                <a href="/product" class="menu-item">
+                    <i class="bi bi-box"></i>
                     产品信息
                 </a>
-                <a href="javascript:void(0)" class="menu-item" data-route="machine">
+                <a href="/machine" class="menu-item">
                     <i class="bi bi-hdd"></i>
                     机器信息
                 </a>
@@ -545,35 +81,35 @@
                 <i class="bi bi-chevron-down arrow"></i>
             </a>
             <div class="submenu">
-                <a href="javascript:void(0)" class="menu-item" data-route="agent-account">
+                <a href="/agent-account" class="menu-item">
                     <i class="bi bi-credit-card"></i>
                     代理账户
                 </a>
-                <a href="javascript:void(0)" class="menu-item" data-route="profit">
+                <a href="/profit" class="menu-item">
                     <i class="bi bi-cash-stack"></i>
                     分润信息
                 </a>
-                <a href="javascript:void(0)" class="menu-item" data-route="account-detail">
+                <a href="/account-detail" class="menu-item">
                     <i class="bi bi-list-ul"></i>
                     账户明细
                 </a>
-                <a href="javascript:void(0)" class="menu-item" data-route="statement">
+                <a href="/statement" class="menu-item">
                     <i class="bi bi-file-earmark-text"></i>
                     对账单
                 </a>
             </div>
 
             <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
-                <i class="bi bi-exchange"></i>
+                <i class="bi bi-shuffle"></i>
                 交易管理
                 <i class="bi bi-chevron-down arrow"></i>
             </a>
             <div class="submenu">
-                <a href="javascript:void(0)" class="menu-item" data-route="channel">
+                <a href="/channel" class="menu-item">
                     <i class="bi bi-link-45deg"></i>
                     通道管理
                 </a>
-                <a href="javascript:void(0)" class="menu-item" data-route="transaction">
+                <a href="/transaction" class="menu-item">
                     <i class="bi bi-bar-chart-line"></i>
                     交易明细
                 </a>
@@ -581,160 +117,87 @@
         </div>
     </div>
 
-    <!-- Content Wrapper -->
     <div id="content-wrapper">
-        <!-- Topbar -->
         <nav class="topbar">
-            <div class="topbar-title" id="page-title">首页</div>
+            <div class="topbar-title" th:text="${pageTitle}">首页</div>
             <div class="topbar-user">
-                <div class="avatar">管</div>
-                <span>管理员</span>
-                <i class="bi bi-chevron-down"></i>
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="showUserProfile()">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
 
-        <!-- Page Content -->
+        <div class="modal fade" id="userProfileModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-person-circle"></i> 个人信息</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <div class="avatar-large mx-auto mb-3" id="profileAvatar">管</div>
+                            <h5 id="profileUsername">管理员</h5>
+                            <span class="badge bg-primary" id="profileRole">系统管理员</span>
+                        </div>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th width="100">用户名:</th>
+                                <td id="profileUsername2">-</td>
+                            </tr>
+                            <tr>
+                                <th>姓名:</th>
+                                <td id="profileRealName">-</td>
+                            </tr>
+                            <tr>
+                                <th>手机:</th>
+                                <td id="profilePhone">-</td>
+                            </tr>
+                            <tr>
+                                <th>邮箱:</th>
+                                <td id="profileEmail">-</td>
+                            </tr>
+                            <tr>
+                                <th>状态:</th>
+                                <td><span class="badge bg-success" id="profileStatus">正常</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="page-content">
-            <!-- 页面内容将通过AJAX加载 -->
-        </div>
-    </div>
-</div>
-
-<!-- Loading -->
-<div id="loading" class="loading">
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-</div>
-
-<!-- Toast Container -->
-<div class="toast-container">
-    <div id="toast" class="toast" role="alert">
-        <div class="toast-header">
-            <strong class="me-auto" id="toast-title">提示</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-        </div>
-        <div class="toast-body" id="toast-message"></div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // 全局变量
-    let currentRoute = 'dashboard';
-    let toastInstance = null;
-
-    // 页面路由配置
-    const routes = {
-        'dashboard': { title: '首页', url: '/dashboard' },
-        'agent': { title: '代理商管理', url: '/agent' },
-        'merchant': { title: '商户管理', url: '/merchant' },
-        'product': { title: '产品信息', url: '/product' },
-        'machine': { title: '机器信息', url: '/machine' },
-        'agent-account': { title: '代理账户', url: '/agent-account' },
-        'profit': { title: '分润信息', url: '/profit' },
-        'account-detail': { title: '账户明细', url: '/account-detail' },
-        'statement': { title: '对账单', url: '/statement' },
-        'channel': { title: '通道管理', url: '/channel' },
-        'transaction': { title: '交易明细', url: '/transaction' }
-    };
-
-    // 页面初始化
-    document.addEventListener('DOMContentLoaded', function() {
-        // 初始化Toast
-        const toastEl = document.getElementById('toast');
-        toastInstance = new bootstrap.Toast(toastEl);
-
-        // 绑定菜单点击事件
-        document.querySelectorAll('.menu-item[data-route]').forEach(item => {
-            item.addEventListener('click', function() {
-                const route = this.getAttribute('data-route');
-                navigateTo(route);
-            });
-        });
-
-        // 加载首页
-        loadPage('dashboard');
-    });
-
-    // 切换菜单展开
-    function toggleMenu(menuItem) {
-        const submenu = menuItem.nextElementSibling;
-        menuItem.classList.toggle('expanded');
-        submenu.classList.toggle('show');
-    }
-
-    // 导航到页面
-    function navigateTo(route) {
-        // 更新菜单激活状态
-        document.querySelectorAll('.menu-item.active').forEach(item => {
-            item.classList.remove('active');
-        });
-
-        const menuItem = document.querySelector(`.menu-item[data-route="${route}"]`);
-        if (menuItem) {
-            menuItem.classList.add('active');
-
-            // 展开父菜单
-            const parentSubmenu = menuItem.closest('.submenu');
-            if (parentSubmenu) {
-                parentSubmenu.classList.add('show');
-                const parentMenuItem = parentSubmenu.previousElementSibling;
-                if (parentMenuItem) {
-                    parentMenuItem.classList.add('expanded');
-                }
-            }
-        }
-
-        // 更新页面标题
-        const routeConfig = routes[route];
-        if (routeConfig) {
-            document.getElementById('page-title').textContent = routeConfig.title;
-        }
-
-        // 加载页面内容
-        loadPage(route);
-        currentRoute = route;
-    }
-
-    // 加载页面内容
-    function loadPage(route) {
-        const pageContent = document.getElementById('page-content');
-
-        // 显示加载
-        showLoading();
-
-        // 根据路由加载不同的页面内容
-        switch(route) {
-            case 'dashboard':
-                loadDashboardPage(pageContent);
-                break;
-            case 'agent':
-                loadAgentPage(pageContent);
-                break;
-            case 'merchant':
-                loadMerchantPage(pageContent);
-                break;
-            case 'machine':
-                loadMachinePage(pageContent);
-                break;
-            default:
-                loadPlaceholderPage(pageContent, route);
-        }
-    }
-
-    // 加载仪表盘页面
-    function loadDashboardPage(container) {
-        container.innerHTML = `
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="navigateTo('dashboard')">首页</a></li>
+                    <li class="breadcrumb-item"><a href="/">首页</a></li>
                     <li class="breadcrumb-item active">仪表盘</li>
                 </ol>
             </nav>
 
-            <!-- 统计卡片 -->
             <div class="row mb-4">
                 <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card stat-card primary h-100 py-2">
@@ -801,7 +264,6 @@
                 </div>
             </div>
 
-            <!-- 额外统计卡片 -->
             <div class="row mb-4">
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card stat-card primary h-100 py-2">
@@ -852,7 +314,6 @@
                 </div>
             </div>
 
-            <!-- 图表区域 -->
             <div class="row">
                 <div class="col-xl-8 col-lg-7">
                     <div class="card shadow mb-4">
@@ -880,16 +341,52 @@
                     </div>
                 </div>
             </div>
-        `;
+        </div>
+    </div>
+</div>
 
-        // 加载统计数据
-        loadDashboardData();
-        hideLoading();
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x" style="z-index: 9999; margin-top: 20px;">
+    <div id="toast" class="toast" role="alert" data-bs-delay="2000">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    function showUserProfile() {
+        const username = document.querySelector('.user-name')?.textContent || '管理员';
+        const role = document.querySelector('.user-role')?.textContent || '系统管理员';
+        
+        document.getElementById('profileAvatar').textContent = username.charAt(0);
+        document.getElementById('profileUsername').textContent = username;
+        document.getElementById('profileUsername2').textContent = username;
+        document.getElementById('profileRole').textContent = role;
+        
+        document.getElementById('profileRealName').textContent = '-';
+        document.getElementById('profilePhone').textContent = '-';
+        document.getElementById('profileEmail').textContent = '-';
+        
+        const modal = new bootstrap.Modal(document.getElementById('userProfileModal'));
+        modal.show();
     }
 
-    // 加载仪表盘数据
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDashboardData();
+    });
+
     function loadDashboardData() {
-        // 加载概览数据
         fetch('/api/dashboard/overview')
             .then(response => response.json())
             .then(result => {
@@ -908,14 +405,12 @@
                 console.error('加载统计数据失败:', error);
             });
 
-        // 加载趋势数据
         fetch('/api/dashboard/trend')
             .then(response => response.json())
             .then(result => {
                 if (result.code === 200 && result.data) {
-                    const data = result.data;
-                    renderTransactionChart(data);
-                    renderGrowthChart(data);
+                    renderTransactionChart(result.data);
+                    renderGrowthChart(result.data);
                 }
             })
             .catch(error => {
@@ -923,7 +418,6 @@
             });
     }
 
-    // 渲染交易趋势图
     function renderTransactionChart(data) {
         const ctx = document.getElementById('transactionChart').getContext('2d');
 
@@ -966,11 +460,9 @@
         });
     }
 
-    // 渲染新增统计图表
     function renderGrowthChart(data) {
         const ctx = document.getElementById('growthChart').getContext('2d');
 
-        // 取近7天的数据
         const dates = data.dates ? data.dates.slice(-7) : [];
         const merchantCounts = data.merchantCounts ? data.merchantCounts.slice(-7) : [];
         const agentCounts = data.agentCounts ? data.agentCounts.slice(-7) : [];
@@ -1012,1073 +504,6 @@
                 }
             }
         });
-    }
-
-    // 加载代理商页面
-    function loadAgentPage(container) {
-        container.innerHTML = `
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="navigateTo('dashboard')">首页</a></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">用户管理</a></li>
-                    <li class="breadcrumb-item active">代理商管理</li>
-                </ol>
-            </nav>
-
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>代理商列表</span>
-                    <div>
-                        <button class="btn btn-primary btn-sm" onclick="showAddAgentModal()">
-                            <i class="bi bi-plus-circle"></i> 新增代理商
-                        </button>
-                        <button class="btn btn-info btn-sm" onclick="loadAgentTree()">
-                            <i class="bi bi-diagram-3"></i> 层级视图
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="search-box">
-                        <input type="text" class="form-control" id="agent-search-name" placeholder="代理商名称">
-                        <input type="text" class="form-control" id="agent-search-no" placeholder="代理商编号">
-                        <select class="form-select" id="agent-search-level">
-                            <option value="">全部级别</option>
-                            <option value="1">一级代理</option>
-                            <option value="2">二级代理</option>
-                            <option value="3">三级代理</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="searchAgents()">
-                            <i class="bi bi-search"></i> 搜索
-                        </button>
-                        <button class="btn btn-secondary" onclick="resetAgentSearch()">
-                            <i class="bi bi-arrow-repeat"></i> 重置
-                        </button>
-                    </div>
-
-                    <div class="table-container">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>代理商编号</th>
-                                    <th>代理商名称</th>
-                                    <th>级别</th>
-                                    <th>上级代理</th>
-                                    <th>联系人</th>
-                                    <th>联系电话</th>
-                                    <th>直属商户数</th>
-                                    <th>状态</th>
-                                    <th>创建时间</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="agent-table-body">
-                                <tr>
-                                    <td colspan="10" class="text-center text-muted">加载中...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted">共 <span id="agent-total">0</span> 条记录</div>
-                        <nav>
-                            <ul class="pagination" id="agent-pagination">
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 新增/编辑代理商模态框 -->
-            <div class="modal fade" id="agent-modal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="agent-modal-title">新增代理商</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="agent-form">
-                                <input type="hidden" id="agent-id">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">代理商名称 <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="agent-name" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">上级代理</label>
-                                        <select class="form-select" id="agent-parent-id">
-                                            <option value="0">无（一级代理）</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">联系人</label>
-                                        <input type="text" class="form-control" id="agent-contact-name">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">联系电话</label>
-                                        <input type="text" class="form-control" id="agent-phone">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">邮箱</label>
-                                        <input type="email" class="form-control" id="agent-email">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">身份证号</label>
-                                        <input type="text" class="form-control" id="agent-id-card">
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">地址</label>
-                                    <input type="text" class="form-control" id="agent-address">
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">开户银行</label>
-                                        <input type="text" class="form-control" id="agent-bank-name">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">银行账号</label>
-                                        <input type="text" class="form-control" id="agent-bank-account">
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">状态</label>
-                                    <select class="form-select" id="agent-status">
-                                        <option value="1">启用</option>
-                                        <option value="0">禁用</option>
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                            <button type="button" class="btn btn-primary" onclick="saveAgent()">保存</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 层级视图模态框 -->
-            <div class="modal fade" id="agent-tree-modal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">代理商层级结构</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="agent-tree-container" style="max-height: 500px; overflow-y: auto;">
-                                <div class="text-center text-muted">加载中...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // 初始化页面
-        initAgentPage();
-        hideLoading();
-    }
-
-    // 初始化代理商页面
-    function initAgentPage() {
-        loadAgents(1);
-        loadAgentOptions();
-    }
-
-    let agentCurrentPage = 1;
-    let agentPageSize = 10;
-
-    // 加载代理商列表
-    function loadAgents(pageNum) {
-        agentCurrentPage = pageNum || 1;
-
-        const params = new URLSearchParams({
-            pageNum: agentCurrentPage,
-            pageSize: agentPageSize
-        });
-
-        const name = document.getElementById('agent-search-name')?.value;
-        const no = document.getElementById('agent-search-no')?.value;
-        const level = document.getElementById('agent-search-level')?.value;
-
-        if (name) params.append('agentName', name);
-        if (no) params.append('agentNo', no);
-        if (level && level !== '') params.append('level', level);
-
-        fetch('/agent/api/list?' + params.toString())
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === 200) {
-                    renderAgentTable(result.data || []);
-                    document.getElementById('agent-total').textContent = result.total || 0;
-                    renderAgentPagination(result.total || 0);
-                } else {
-                    showToast('error', '加载数据失败: ' + result.message);
-                }
-            })
-            .catch(error => {
-                console.error('加载代理商列表失败:', error);
-                showToast('error', '加载数据失败');
-            });
-    }
-
-    // 渲染代理商表格
-    function renderAgentTable(agents) {
-        const tbody = document.getElementById('agent-table-body');
-        if (!agents || agents.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">暂无数据</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = agents.map(agent => `
-            <tr>
-                <td>${agent.agentNo || '-'}</td>
-                <td>${agent.agentName || '-'}</td>
-                <td><span class="badge bg-primary">${getLevelLabel(agent.level)}</span></td>
-                <td>${agent.parentName || '-'}</td>
-                <td>${agent.contactName || '-'}</td>
-                <td>${agent.phone || '-'}</td>
-                <td><span class="badge bg-info">${agent.directMerchantCount || 0}</span></td>
-                <td>${getStatusBadge(agent.status)}</td>
-                <td>${agent.createTime ? formatDateTime(agent.createTime) : '-'}</td>
-                <td>
-                    <div class="action-btns">
-                        <button class="btn btn-sm btn-info" onclick="viewAgent(${agent.id})">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-primary" onclick="editAgent(${agent.id})">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteAgent(${agent.id})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    // 渲染分页
-    function renderAgentPagination(total) {
-        const pagination = document.getElementById('agent-pagination');
-        const totalPages = Math.ceil(total / agentPageSize);
-
-        let html = '';
-
-        // 上一页
-        html += `<li class="page-item ${agentCurrentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="javascript:void(0)" onclick="loadAgents(${agentCurrentPage - 1})">上一页</a>
-        </li>`;
-
-        // 页码
-        for (let i = 1; i <= Math.min(totalPages, 5); i++) {
-            html += `<li class="page-item ${i === agentCurrentPage ? 'active' : ''}">
-                <a class="page-link" href="javascript:void(0)" onclick="loadAgents(${i})">${i}</a>
-            </li>`;
-        }
-
-        // 下一页
-        html += `<li class="page-item ${agentCurrentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
-            <a class="page-link" href="javascript:void(0)" onclick="loadAgents(${agentCurrentPage + 1})">下一页</a>
-        </li>`;
-
-        pagination.innerHTML = html;
-    }
-
-    // 搜索代理商
-    function searchAgents() {
-        loadAgents(1);
-    }
-
-    // 重置搜索
-    function resetAgentSearch() {
-        document.getElementById('agent-search-name').value = '';
-        document.getElementById('agent-search-no').value = '';
-        document.getElementById('agent-search-level').value = '';
-        loadAgents(1);
-    }
-
-    // 加载代理商选项
-    function loadAgentOptions() {
-        fetch('/agent/api/options')
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === 200 && result.data) {
-                    const select = document.getElementById('agent-parent-id');
-                    if (select) {
-                        const options = result.data.map(agent => {
-                            const prefix = '　'.repeat((agent.level || 1) - 1);
-                            return `<option value="${agent.id}">${prefix}${agent.agentName} (${agent.agentNo})</option>`;
-                        });
-                        select.innerHTML = '<option value="0">无（一级代理）</option>' + options.join('');
-                    }
-                }
-            })
-            .catch(error => console.error('加载代理商选项失败:', error));
-    }
-
-    // 显示新增代理商模态框
-    function showAddAgentModal() {
-        document.getElementById('agent-modal-title').textContent = '新增代理商';
-        document.getElementById('agent-form').reset();
-        document.getElementById('agent-id').value = '';
-        loadAgentOptions();
-        new bootstrap.Modal(document.getElementById('agent-modal')).show();
-    }
-
-    // 编辑代理商
-    function editAgent(id) {
-        document.getElementById('agent-modal-title').textContent = '编辑代理商';
-        loadAgentOptions();
-
-        fetch(`/agent/api/${id}`)
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === 200 && result.data) {
-                    const agent = result.data;
-                    document.getElementById('agent-id').value = agent.id;
-                    document.getElementById('agent-name').value = agent.agentName || '';
-                    document.getElementById('agent-parent-id').value = agent.parentId || 0;
-                    document.getElementById('agent-contact-name').value = agent.contactName || '';
-                    document.getElementById('agent-phone').value = agent.phone || '';
-                    document.getElementById('agent-email').value = agent.email || '';
-                    document.getElementById('agent-id-card').value = agent.idCard || '';
-                    document.getElementById('agent-address').value = agent.address || '';
-                    document.getElementById('agent-bank-name').value = agent.bankName || '';
-                    document.getElementById('agent-bank-account').value = agent.bankAccount || '';
-                    document.getElementById('agent-status').value = agent.status !== undefined ? agent.status : 1;
-
-                    new bootstrap.Modal(document.getElementById('agent-modal')).show();
-                } else {
-                    showToast('error', '获取代理商信息失败');
-                }
-            })
-            .catch(error => {
-                console.error('获取代理商信息失败:', error);
-                showToast('error', '获取代理商信息失败');
-            });
-    }
-
-    // 查看代理商
-    function viewAgent(id) {
-        fetch(`/agent/api/${id}`)
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === 200 && result.data) {
-                    const agent = result.data;
-                    alert(`代理商信息:\n\n编号: ${agent.agentNo}\n名称: ${agent.agentName}\n级别: ${getLevelLabel(agent.level)}\n联系人: ${agent.contactName || '-'}\n电话: ${agent.phone || '-'}\n直属商户数: ${agent.directMerchantCount || 0}`);
-                }
-            });
-    }
-
-    // 保存代理商
-    function saveAgent() {
-        const id = document.getElementById('agent-id').value;
-        const data = {
-            agentName: document.getElementById('agent-name').value,
-            parentId: parseInt(document.getElementById('agent-parent-id').value) || 0,
-            contactName: document.getElementById('agent-contact-name').value,
-            phone: document.getElementById('agent-phone').value,
-            email: document.getElementById('agent-email').value,
-            idCard: document.getElementById('agent-id-card').value,
-            address: document.getElementById('agent-address').value,
-            bankName: document.getElementById('agent-bank-name').value,
-            bankAccount: document.getElementById('agent-bank-account').value,
-            status: parseInt(document.getElementById('agent-status').value)
-        };
-
-        if (!data.agentName) {
-            showToast('warning', '请输入代理商名称');
-            return;
-        }
-
-        const url = id ? '/agent/api/update' : '/agent/api/add';
-        if (id) data.id = parseInt(id);
-
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.code === 200) {
-                showToast('success', '保存成功');
-                bootstrap.Modal.getInstance(document.getElementById('agent-modal')).hide();
-                loadAgents(agentCurrentPage);
-            } else {
-                showToast('error', result.message || '保存失败');
-            }
-        })
-        .catch(error => {
-            console.error('保存代理商失败:', error);
-            showToast('error', '保存失败');
-        });
-    }
-
-    // 删除代理商
-    function deleteAgent(id) {
-        if (confirm('确定要删除该代理商吗？')) {
-            fetch(`/agent/api/delete/${id}`, { method: 'POST' })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.code === 200) {
-                        showToast('success', '删除成功');
-                        loadAgents(agentCurrentPage);
-                    } else {
-                        showToast('error', result.message || '删除失败');
-                    }
-                })
-                .catch(error => {
-                    console.error('删除代理商失败:', error);
-                    showToast('error', '删除失败');
-                });
-        }
-    }
-
-    // 加载代理商层级树
-    function loadAgentTree() {
-        const modal = new bootstrap.Modal(document.getElementById('agent-tree-modal'));
-        modal.show();
-
-        fetch('/agent/api/tree')
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === 200 && result.data) {
-                    const container = document.getElementById('agent-tree-container');
-                    container.innerHTML = renderAgentTreeNodes(result.data, 0);
-                } else {
-                    document.getElementById('agent-tree-container').innerHTML =
-                        '<div class="text-center text-muted">加载失败</div>';
-                }
-            })
-            .catch(error => {
-                console.error('加载代理商树失败:', error);
-                document.getElementById('agent-tree-container').innerHTML =
-                    '<div class="text-center text-muted">加载失败</div>';
-            });
-    }
-
-    // 渲染树形节点
-    function renderAgentTreeNodes(nodes, level) {
-        if (!nodes || nodes.length === 0) return '';
-
-        let html = '';
-        nodes.forEach(node => {
-            const hasChildren = node.children && node.children.length > 0;
-            html += `
-                <div class="tree-item" style="margin-left: ${level * 20}px;">
-                    <div class="d-flex align-items-center">
-                        <i class="bi ${hasChildren ? 'bi-folder-fill text-warning' : 'bi-person-badge text-primary'} me-2"></i>
-                        <strong>${node.agentName}</strong>
-                        <span class="badge bg-info ms-2">${getLevelLabel(node.level)}</span>
-                        <span class="badge bg-secondary ms-2">直属商户: ${node.directMerchantCount || 0}</span>
-                        <span class="text-muted ms-2">(${node.agentNo})</span>
-                    </div>
-                </div>
-            `;
-            if (hasChildren) {
-                html += renderAgentTreeNodes(node.children, level + 1);
-            }
-        });
-        return html;
-    }
-
-    // 加载机器页面
-    function loadMachinePage(container) {
-        container.innerHTML = `
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="navigateTo('dashboard')">首页</a></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">产品管理</a></li>
-                    <li class="breadcrumb-item active">机器信息</li>
-                </ol>
-            </nav>
-
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>机器列表</span>
-                    <div>
-                        <button class="btn btn-success btn-sm" onclick="downloadMachineTemplate()">
-                            <i class="bi bi-download"></i> 下载导入模板
-                        </button>
-                        <button class="btn btn-info btn-sm" onclick="showImportModal()">
-                            <i class="bi bi-upload"></i> 批量导入
-                        </button>
-                        <button class="btn btn-primary btn-sm" onclick="showAddMachineModal()">
-                            <i class="bi bi-plus-circle"></i> 新增机器
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="search-box">
-                        <input type="text" class="form-control" id="machine-search-no" placeholder="机器编号">
-                        <input type="text" class="form-control" id="machine-search-sn" placeholder="SN码">
-                        <select class="form-select" id="machine-search-status">
-                            <option value="">全部状态</option>
-                            <option value="0">库存</option>
-                            <option value="1">已出库</option>
-                            <option value="2">已绑定</option>
-                            <option value="3">故障</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="searchMachines()">
-                            <i class="bi bi-search"></i> 搜索
-                        </button>
-                        <button class="btn btn-secondary" onclick="resetMachineSearch()">
-                            <i class="bi bi-arrow-repeat"></i> 重置
-                        </button>
-                    </div>
-
-                    <div class="table-container">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>机器编号</th>
-                                    <th>SN码</th>
-                                    <th>MAC地址</th>
-                                    <th>产品名称</th>
-                                    <th>所属代理</th>
-                                    <th>绑定商户</th>
-                                    <th>状态</th>
-                                    <th>采购日期</th>
-                                    <th>激活时间</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="machine-table-body">
-                                <tr>
-                                    <td colspan="10" class="text-center text-muted">加载中...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted">共 <span id="machine-total">0</span> 条记录</div>
-                        <nav>
-                            <ul class="pagination" id="machine-pagination">
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 新增机器模态框 -->
-            <div class="modal fade" id="machine-modal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="machine-modal-title">新增机器</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="machine-form">
-                                <input type="hidden" id="machine-id">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">机器编号 <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="machine-no" placeholder="自动生成或手动输入">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">SN码 <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="machine-sn" required>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">MAC地址</label>
-                                        <input type="text" class="form-control" id="machine-mac" placeholder="如: 00:11:22:33:44:AA">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">产品 <span class="text-danger">*</span></label>
-                                        <select class="form-select" id="machine-product-id" required>
-                                            <option value="">请选择产品</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">所属代理</label>
-                                        <select class="form-select" id="machine-agent-id">
-                                            <option value="">未分配</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">绑定商户</label>
-                                        <select class="form-select" id="machine-merchant-id">
-                                            <option value="">未绑定</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">采购日期</label>
-                                        <input type="date" class="form-control" id="machine-purchase-date">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">状态</label>
-                                        <select class="form-select" id="machine-status">
-                                            <option value="0">库存</option>
-                                            <option value="1">已出库</option>
-                                            <option value="2">已绑定</option>
-                                            <option value="3">故障</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                            <button type="button" class="btn btn-primary" onclick="saveMachine()">保存</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 批量导入模态框 -->
-            <div class="modal fade" id="import-modal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">批量导入机器</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="alert alert-info">
-                                <i class="bi bi-info-circle"></i> 请先下载导入模板，按照模板格式填写数据后上传Excel文件。
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">选择所属代理（可选）</label>
-                                <select class="form-select" id="import-agent-id">
-                                    <option value="">不指定</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">选择Excel文件 <span class="text-danger">*</span></label>
-                                <input type="file" class="form-control" id="import-file" accept=".xlsx,.xls">
-                            </div>
-                            <div id="import-result" style="display: none;">
-                                <hr>
-                                <h6>导入结果：</h6>
-                                <div id="import-result-content"></div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-                            <button type="button" class="btn btn-primary" onclick="importMachines()">开始导入</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // 初始化页面
-        initMachinePage();
-        hideLoading();
-    }
-
-    let machineCurrentPage = 1;
-    let machinePageSize = 10;
-
-    // 初始化机器页面
-    function initMachinePage() {
-        loadMachines(1);
-        loadProductOptions();
-        loadAgentOptionsForMachine();
-    }
-
-    // 加载机器列表
-    function loadMachines(pageNum) {
-        machineCurrentPage = pageNum || 1;
-
-        const params = new URLSearchParams({
-            pageNum: machineCurrentPage,
-            pageSize: machinePageSize
-        });
-
-        const no = document.getElementById('machine-search-no')?.value;
-        const sn = document.getElementById('machine-search-sn')?.value;
-        const status = document.getElementById('machine-search-status')?.value;
-
-        if (no) params.append('machineNo', no);
-        if (sn) params.append('sn', sn);
-        if (status && status !== '') params.append('status', status);
-
-        fetch('/machine/api/list?' + params.toString())
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === 200) {
-                    renderMachineTable(result.data || []);
-                    document.getElementById('machine-total').textContent = result.total || 0;
-                    renderMachinePagination(result.total || 0);
-                }
-            })
-            .catch(error => console.error('加载机器列表失败:', error));
-    }
-
-    // 渲染机器表格
-    function renderMachineTable(machines) {
-        const tbody = document.getElementById('machine-table-body');
-        if (!machines || machines.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">暂无数据</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = machines.map(machine => `
-            <tr>
-                <td>${machine.machineNo || '-'}</td>
-                <td>${machine.sn || '-'}</td>
-                <td>${machine.macAddress || '-'}</td>
-                <td>${machine.productName || '-'}</td>
-                <td>${machine.agentName || '-'}</td>
-                <td>${machine.merchantName || '-'}</td>
-                <td>${getMachineStatusBadge(machine.status)}</td>
-                <td>${machine.purchaseDate || '-'}</td>
-                <td>${machine.activateTime ? formatDateTime(machine.activateTime) : '-'}</td>
-                <td>
-                    <div class="action-btns">
-                        <button class="btn btn-sm btn-info" onclick="viewMachine(${machine.id})">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-primary" onclick="editMachine(${machine.id})">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteMachine(${machine.id})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    // 渲染机器分页
-    function renderMachinePagination(total) {
-        const pagination = document.getElementById('machine-pagination');
-        const totalPages = Math.ceil(total / machinePageSize);
-
-        let html = '';
-        html += `<li class="page-item ${machineCurrentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="javascript:void(0)" onclick="loadMachines(${machineCurrentPage - 1})">上一页</a>
-        </li>`;
-
-        for (let i = 1; i <= Math.min(totalPages, 5); i++) {
-            html += `<li class="page-item ${i === machineCurrentPage ? 'active' : ''}">
-                <a class="page-link" href="javascript:void(0)" onclick="loadMachines(${i})">${i}</a>
-            </li>`;
-        }
-
-        html += `<li class="page-item ${machineCurrentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
-            <a class="page-link" href="javascript:void(0)" onclick="loadMachines(${machineCurrentPage + 1})">下一页</a>
-        </li>`;
-
-        pagination.innerHTML = html;
-    }
-
-    // 搜索机器
-    function searchMachines() {
-        loadMachines(1);
-    }
-
-    // 重置机器搜索
-    function resetMachineSearch() {
-        document.getElementById('machine-search-no').value = '';
-        document.getElementById('machine-search-sn').value = '';
-        document.getElementById('machine-search-status').value = '';
-        loadMachines(1);
-    }
-
-    // 加载产品选项
-    function loadProductOptions() {
-        // 预留：从API加载产品列表
-    }
-
-    // 加载代理选项（机器页面）
-    function loadAgentOptionsForMachine() {
-        fetch('/agent/api/options')
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === 200 && result.data) {
-                    const select = document.getElementById('machine-agent-id');
-                    const importSelect = document.getElementById('import-agent-id');
-                    if (select) {
-                        const options = result.data.map(a =>
-                            `<option value="${a.id}">${a.agentName} (${a.agentNo})</option>`
-                        );
-                        select.innerHTML = '<option value="">未分配</option>' + options.join('');
-                    }
-                    if (importSelect) {
-                        const options = result.data.map(a =>
-                            `<option value="${a.id}">${a.agentName} (${a.agentNo})</option>`
-                        );
-                        importSelect.innerHTML = '<option value="">不指定</option>' + options.join('');
-                    }
-                }
-            })
-            .catch(error => console.error('加载代理选项失败:', error));
-    }
-
-    // 显示新增机器模态框
-    function showAddMachineModal() {
-        document.getElementById('machine-modal-title').textContent = '新增机器';
-        document.getElementById('machine-form').reset();
-        document.getElementById('machine-id').value = '';
-        new bootstrap.Modal(document.getElementById('machine-modal')).show();
-    }
-
-    // 编辑机器
-    function editMachine(id) {
-        fetch(`/machine/api/${id}`)
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === 200 && result.data) {
-                    const machine = result.data;
-                    document.getElementById('machine-modal-title').textContent = '编辑机器';
-                    document.getElementById('machine-id').value = machine.id;
-                    document.getElementById('machine-no').value = machine.machineNo || '';
-                    document.getElementById('machine-sn').value = machine.sn || '';
-                    document.getElementById('machine-mac').value = machine.macAddress || '';
-                    document.getElementById('machine-product-id').value = machine.productId || '';
-                    document.getElementById('machine-agent-id').value = machine.agentId || '';
-                    document.getElementById('machine-merchant-id').value = machine.merchantId || '';
-                    document.getElementById('machine-purchase-date').value = machine.purchaseDate || '';
-                    document.getElementById('machine-status').value = machine.status !== undefined ? machine.status : 0;
-                    new bootstrap.Modal(document.getElementById('machine-modal')).show();
-                }
-            });
-    }
-
-    // 查看机器
-    function viewMachine(id) {
-        fetch(`/machine/api/${id}`)
-            .then(response => response.json())
-            .then(result => {
-                if (result.code === 200 && result.data) {
-                    const m = result.data;
-                    alert(`机器信息:\n\n编号: ${m.machineNo}\nSN: ${m.sn}\n产品: ${m.productName || '-'}\n状态: ${getMachineStatusLabel(m.status)}\n绑定商户: ${m.merchantName || '-'}`);
-                }
-            });
-    }
-
-    // 保存机器
-    function saveMachine() {
-        const id = document.getElementById('machine-id').value;
-        const data = {
-            machineNo: document.getElementById('machine-no').value,
-            sn: document.getElementById('machine-sn').value,
-            macAddress: document.getElementById('machine-mac').value,
-            productId: parseInt(document.getElementById('machine-product-id').value) || null,
-            agentId: parseInt(document.getElementById('machine-agent-id').value) || null,
-            merchantId: parseInt(document.getElementById('machine-merchant-id').value) || null,
-            purchaseDate: document.getElementById('machine-purchase-date').value || null,
-            status: parseInt(document.getElementById('machine-status').value)
-        };
-
-        if (!data.sn) {
-            showToast('warning', '请输入SN码');
-            return;
-        }
-
-        const url = id ? '/machine/api/update' : '/machine/api/add';
-        if (id) data.id = parseInt(id);
-
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.code === 200) {
-                showToast('success', '保存成功');
-                bootstrap.Modal.getInstance(document.getElementById('machine-modal')).hide();
-                loadMachines(machineCurrentPage);
-            } else {
-                showToast('error', result.message || '保存失败');
-            }
-        });
-    }
-
-    // 删除机器
-    function deleteMachine(id) {
-        if (confirm('确定要删除该机器吗？')) {
-            fetch(`/machine/api/delete/${id}`, { method: 'POST' })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.code === 200) {
-                        showToast('success', '删除成功');
-                        loadMachines(machineCurrentPage);
-                    } else {
-                        showToast('error', result.message || '删除失败');
-                    }
-                });
-        }
-    }
-
-    // 下载导入模板
-    function downloadMachineTemplate() {
-        window.location.href = '/machine/api/export/template';
-    }
-
-    // 显示导入模态框
-    function showImportModal() {
-        document.getElementById('import-result').style.display = 'none';
-        document.getElementById('import-file').value = '';
-        new bootstrap.Modal(document.getElementById('import-modal')).show();
-    }
-
-    // 导入机器
-    function importMachines() {
-        const fileInput = document.getElementById('import-file');
-        const file = fileInput.files[0];
-        if (!file) {
-            showToast('warning', '请选择Excel文件');
-            return;
-        }
-
-        const agentId = document.getElementById('import-agent-id').value;
-        const formData = new FormData();
-        formData.append('file', file);
-        if (agentId) formData.append('agentId', agentId);
-
-        showLoading();
-        fetch('/machine/api/import', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(result => {
-            hideLoading();
-            const resultDiv = document.getElementById('import-result');
-            const resultContent = document.getElementById('import-result-content');
-            resultDiv.style.display = 'block';
-
-            if (result.code === 200 && result.data) {
-                const data = result.data;
-                resultContent.innerHTML = `
-                    <div class="alert alert-success">
-                        导入完成！成功: ${data.successCount}, 失败: ${data.errorCount}
-                    </div>
-                    ${data.errorList && data.errorList.length > 0 ? `
-                        <div class="alert alert-danger">
-                            <h6>失败列表：</h6>
-                            <ul class="mb-0">
-                                ${data.errorList.map(e => `<li>第${e.rowNum}行: ${e.error}</li>`).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                `;
-                if (data.successCount > 0) {
-                    loadMachines(1);
-                }
-            } else {
-                resultContent.innerHTML = `<div class="alert alert-danger">导入失败: ${result.message}</div>`;
-            }
-        })
-        .catch(error => {
-            hideLoading();
-            showToast('error', '导入失败');
-        });
-    }
-
-    // 加载占位页面
-    function loadPlaceholderPage(container, route) {
-        const routeConfig = routes[route] || { title: '待开发' };
-        container.innerHTML = `
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="navigateTo('dashboard')">首页</a></li>
-                    <li class="breadcrumb-item active">${routeConfig.title}</li>
-                </ol>
-            </nav>
-            <div class="card">
-                <div class="card-body text-center py-5">
-                    <div class="empty-state">
-                        <i class="bi bi-tools"></i>
-                        <h4>${routeConfig.title}</h4>
-                        <p class="text-muted">该功能模块正在开发中...</p>
-                    </div>
-                </div>
-            </div>
-        `;
-        hideLoading();
-    }
-
-    // ============ 工具函数 ============
-
-    function showLoading() {
-        document.getElementById('loading').classList.add('show');
-    }
-
-    function hideLoading() {
-        document.getElementById('loading').classList.remove('show');
-    }
-
-    function showToast(type, message) {
-        const toastTitle = document.getElementById('toast-title');
-        const toastMessage = document.getElementById('toast-message');
-        const toastEl = document.getElementById('toast');
-
-        const titles = {
-            'success': '成功',
-            'error': '错误',
-            'warning': '警告',
-            'info': '提示'
-        };
-
-        toastTitle.textContent = titles[type] || '提示';
-        toastMessage.textContent = message;
-
-        toastEl.className = 'toast';
-        if (type === 'success') toastEl.classList.add('bg-success', 'text-white');
-        else if (type === 'error') toastEl.classList.add('bg-danger', 'text-white');
-        else if (type === 'warning') toastEl.classList.add('bg-warning');
-        else toastEl.classList.add('bg-info', 'text-white');
-
-        toastInstance.show();
-    }
-
-    function getLevelLabel(level) {
-        const labels = { 1: '一级代理', 2: '二级代理', 3: '三级代理', 4: '四级代理' };
-        return labels[level] || `第${level}级代理`;
-    }
-
-    function getStatusBadge(status) {
-        if (status === 1) return '<span class="badge bg-success">启用</span>';
-        return '<span class="badge bg-danger">禁用</span>';
-    }
-
-    function getMachineStatusBadge(status) {
-        const badges = {
-            0: '<span class="badge bg-secondary">库存</span>',
-            1: '<span class="badge bg-info">已出库</span>',
-            2: '<span class="badge bg-success">已绑定</span>',
-            3: '<span class="badge bg-danger">故障</span>'
-        };
-        return badges[status] || '<span class="badge bg-secondary">未知</span>';
-    }
-
-    function getMachineStatusLabel(status) {
-        const labels = { 0: '库存', 1: '已出库', 2: '已绑定', 3: '故障' };
-        return labels[status] || '未知';
-    }
-
-    function formatNumber(num) {
-        if (num === null || num === undefined) return '0';
-        return num.toLocaleString('zh-CN', { maximumFractionDigits: 2 });
-    }
-
-    function formatDateTime(dateStr) {
-        if (!dateStr) return '-';
-        const date = new Date(dateStr);
-        return date.toLocaleString('zh-CN');
     }
 </script>
 </body>

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - 后台管理系统' : '后台管理系统'}">后台管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <div class="sidebar-brand">
+            <a href="/">
+                <i class="bi bi-gear-wide-connected"></i>
+                后台管理系统
+            </a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item">
+                <i class="bi bi-house-door"></i>
+                首页
+            </a>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-gear"></i>
+                系统管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/system/user" class="menu-item">
+                    <i class="bi bi-person-circle"></i>
+                    系统用户管理
+                </a>
+                <a href="/system/role" class="menu-item">
+                    <i class="bi bi-people-fill"></i>
+                    角色管理
+                </a>
+                <a href="/system/permission" class="menu-item">
+                    <i class="bi bi-key-fill"></i>
+                    权限管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item active" onclick="toggleMenu(this)">
+                <i class="bi bi-person-badge"></i>
+                用户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu open">
+                <a href="/agent" class="menu-item">
+                    <i class="bi bi-building"></i>
+                    代理商管理
+                </a>
+                <a href="/merchant" class="menu-item active">
+                    <i class="bi bi-shop"></i>
+                    商户管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-box-seam"></i>
+                产品管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/product" class="menu-item">
+                    <i class="bi bi-box"></i>
+                    产品信息
+                </a>
+                <a href="/machine" class="menu-item">
+                    <i class="bi bi-hdd"></i>
+                    机器信息
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-wallet2"></i>
+                账户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent-account" class="menu-item">
+                    <i class="bi bi-credit-card"></i>
+                    代理账户
+                </a>
+                <a href="/profit" class="menu-item">
+                    <i class="bi bi-cash-stack"></i>
+                    分润信息
+                </a>
+                <a href="/account-detail" class="menu-item">
+                    <i class="bi bi-list-ul"></i>
+                    账户明细
+                </a>
+                <a href="/statement" class="menu-item">
+                    <i class="bi bi-file-earmark-text"></i>
+                    对账单
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-shuffle"></i>
+                交易管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/channel" class="menu-item">
+                    <i class="bi bi-link-45deg"></i>
+                    通道管理
+                </a>
+                <a href="/transaction" class="menu-item">
+                    <i class="bi bi-bar-chart-line"></i>
+                    交易明细
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <nav class="topbar">
+            <div class="topbar-title" th:text="${pageTitle != null ? pageTitle : '商户管理'}">商户管理</div>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-content">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">首页</a></li>
+                    <li class="breadcrumb-item">用户管理</li>
+                    <li class="breadcrumb-item active">商户管理</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="d-flex flex-wrap gap-3">
+                                <div>
+                                    <label class="form-label small text-muted mb-1">商户名称</label>
+                                    <input type="text" class="form-control form-control-sm" id="search-merchantName" placeholder="请输入商户名称">
+                                </div>
+                                <div>
+                                    <label class="form-label small text-muted mb-1">状态</label>
+                                    <select class="form-select form-select-sm" id="search-merchantStatus">
+                                        <option value="">全部</option>
+                                        <option value="1">启用</option>
+                                        <option value="0">禁用</option>
+                                    </select>
+                                </div>
+                                <div class="align-self-end">
+                                    <button class="btn btn-primary btn-sm" onclick="searchMerchant()">
+                                        <i class="bi bi-search"></i> 查询
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm ms-2" onclick="resetMerchantSearch()">
+                                        <i class="bi bi-arrow-repeat"></i> 重置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm" onclick="openMerchantModal()">
+                                <i class="bi bi-plus"></i> 新增商户
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>商户编号</th>
+                                    <th>商户名称</th>
+                                    <th>所属代理商</th>
+                                    <th>联系人</th>
+                                    <th>手机号</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="merchant-table">
+                                <tr>
+                                    <td colspan="9" class="text-center py-3">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <span class="small text-muted">共 <span id="merchant-total">0</span> 条记录</span>
+                        </div>
+                        <div class="col-auto">
+                            <nav id="merchant-pagination"></nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="merchantModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="merchantModalTitle">新增商户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="merchantForm">
+                    <input type="hidden" id="merchant-id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">商户名称 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="merchant-merchantName" required>
+                        </div>
+                        <div class="col-md-6 mb-3" id="merchant-parent-group">
+                            <label class="form-label">所属代理商 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="merchant-parentId">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">联系人</label>
+                            <input type="text" class="form-control" id="merchant-contactName">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">手机号</label>
+                            <input type="text" class="form-control" id="merchant-phone">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">邮箱</label>
+                            <input type="email" class="form-control" id="merchant-email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="merchant-status">
+                                <option value="1">启用</option>
+                                <option value="0">禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">地址</label>
+                            <input type="text" class="form-control" id="merchant-address">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">身份证号</label>
+                            <input type="text" class="form-control" id="merchant-idCard">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">营业执照</label>
+                            <input type="text" class="form-control" id="merchant-businessLicense">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">开户行</label>
+                            <input type="text" class="form-control" id="merchant-bankName">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">银行账号</label>
+                            <input type="text" class="form-control" id="merchant-bankAccount">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveMerchant()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x" style="z-index: 9999; margin-top: 20px;">
+    <div id="toast" class="toast" role="alert">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    let merchantCurrentPage = 1;
+    let merchantPageSize = 10;
+    let merchantModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        merchantModalInstance = new bootstrap.Modal(document.getElementById('merchantModal'));
+        loadMerchantList();
+        loadAgentOptions();
+    });
+
+    function loadMerchantList() {
+        const merchantName = document.getElementById('search-merchantName').value;
+        const status = document.getElementById('search-merchantStatus').value;
+
+        let url = `/merchant/api/list?pageNum=${merchantCurrentPage}&pageSize=${merchantPageSize}`;
+        if (merchantName) url += `&merchantName=${encodeURIComponent(merchantName)}`;
+        if (status) url += `&status=${status}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200) {
+                    renderMerchantTable(result.data);
+                    renderMerchantPagination(result.total);
+                    document.getElementById('merchant-total').textContent = result.total || 0;
+                } else {
+                    showToast('加载失败: ' + (result.msg || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('加载商户列表失败:', error);
+                showToast('加载失败', 'error');
+            });
+    }
+
+    function renderMerchantTable(data) {
+        const tbody = document.getElementById('merchant-table');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center py-3">暂无数据</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(merchant => {
+            const agentName = merchant.agentName || merchant.parentName || '-';
+            return `
+                <tr>
+                    <td>${merchant.id || '-'}</td>
+                    <td>${escapeHtml(merchant.merchantNo || '-')}</td>
+                    <td>${escapeHtml(merchant.merchantName)}</td>
+                    <td>${escapeHtml(agentName)}</td>
+                    <td>${escapeHtml(merchant.contactName || '-')}</td>
+                    <td>${escapeHtml(merchant.phone || '-')}</td>
+                    <td>${getStatusBadge(merchant.status)}</td>
+                    <td>${merchant.createTime ? formatDateTime(merchant.createTime) : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editMerchant(${merchant.id})">
+                            <i class="bi bi-pencil"></i> 编辑
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteMerchant(${merchant.id})">
+                            <i class="bi bi-trash"></i> 删除
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderMerchantPagination(total) {
+        const totalPages = Math.ceil(total / merchantPageSize);
+        const pagination = document.getElementById('merchant-pagination');
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let html = '<ul class="pagination pagination-sm mb-0">';
+
+        html += `<li class="page-item ${merchantCurrentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToMerchantPage(${merchantCurrentPage - 1})">上一页</a>
+        </li>`;
+
+        for (let i = 1; i <= totalPages && i <= 10; i++) {
+            html += `<li class="page-item ${i === merchantCurrentPage ? 'active' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="goToMerchantPage(${i})">${i}</a>
+            </li>`;
+        }
+
+        html += `<li class="page-item ${merchantCurrentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="goToMerchantPage(${merchantCurrentPage + 1})">下一页</a>
+        </li>`;
+
+        html += '</ul>';
+        pagination.innerHTML = html;
+    }
+
+    function goToMerchantPage(page) {
+        merchantCurrentPage = page;
+        loadMerchantList();
+    }
+
+    function searchMerchant() {
+        merchantCurrentPage = 1;
+        loadMerchantList();
+    }
+
+    function resetMerchantSearch() {
+        document.getElementById('search-merchantName').value = '';
+        document.getElementById('search-merchantStatus').value = '';
+        searchMerchant();
+    }
+
+    function loadAgentOptions() {
+        fetch('/agent/api/options')
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const select = document.getElementById('merchant-parentId');
+                    let html = '<option value="">请选择</option>';
+                    result.data.forEach(agent => {
+                        html += `<option value="${agent.id}">${agent.agentName}</option>`;
+                    });
+                    select.innerHTML = html;
+                }
+            });
+    }
+
+    function openMerchantModal() {
+        document.getElementById('merchantModalTitle').textContent = '新增商户';
+        document.getElementById('merchantForm').reset();
+        document.getElementById('merchant-id').value = '';
+        document.getElementById('merchant-status').value = '1';
+        document.getElementById('merchant-parent-group').style.display = 'block';
+        merchantModalInstance.show();
+    }
+
+    function editMerchant(id) {
+        fetch(`/merchant/api/${id}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const merchant = result.data;
+                    document.getElementById('merchantModalTitle').textContent = '编辑商户';
+                    document.getElementById('merchant-id').value = merchant.id;
+                    document.getElementById('merchant-merchantName').value = merchant.merchantName || '';
+                    document.getElementById('merchant-contactName').value = merchant.contactName || '';
+                    document.getElementById('merchant-phone').value = merchant.phone || '';
+                    document.getElementById('merchant-email').value = merchant.email || '';
+                    document.getElementById('merchant-address').value = merchant.address || '';
+                    document.getElementById('merchant-idCard').value = merchant.idCard || '';
+                    document.getElementById('merchant-businessLicense').value = merchant.businessLicense || '';
+                    document.getElementById('merchant-bankName').value = merchant.bankName || '';
+                    document.getElementById('merchant-bankAccount').value = merchant.bankAccount || '';
+                    document.getElementById('merchant-status').value = merchant.status !== null ? merchant.status : '1';
+
+                    document.getElementById('merchant-parent-group').style.display = 'none';
+
+                    merchantModalInstance.show();
+                } else {
+                    showToast('获取商户信息失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('获取商户信息失败:', error);
+                showToast('获取商户信息失败', 'error');
+            });
+    }
+
+    function saveMerchant() {
+        const id = document.getElementById('merchant-id').value;
+        const merchantName = document.getElementById('merchant-merchantName').value.trim();
+        const parentIdValue = document.getElementById('merchant-parentId').value;
+        const contactName = document.getElementById('merchant-contactName').value.trim();
+        const phone = document.getElementById('merchant-phone').value.trim();
+        const email = document.getElementById('merchant-email').value.trim();
+        const address = document.getElementById('merchant-address').value.trim();
+        const idCard = document.getElementById('merchant-idCard').value.trim();
+        const businessLicense = document.getElementById('merchant-businessLicense').value.trim();
+        const bankName = document.getElementById('merchant-bankName').value.trim();
+        const bankAccount = document.getElementById('merchant-bankAccount').value.trim();
+        const status = parseInt(document.getElementById('merchant-status').value);
+
+        if (!merchantName) {
+            showToast('请输入商户名称', 'error');
+            return;
+        }
+
+        if (!id && !parentIdValue) {
+            showToast('请选择所属代理商', 'error');
+            return;
+        }
+
+        const data = {
+            merchantName: merchantName,
+            contactName: contactName,
+            phone: phone,
+            email: email,
+            address: address,
+            idCard: idCard,
+            businessLicense: businessLicense,
+            bankName: bankName,
+            bankAccount: bankAccount,
+            status: status
+        };
+
+        if (parentIdValue) {
+            data.parentId = parseInt(parentIdValue);
+        }
+
+        let url = '/merchant/api/add';
+        if (id) {
+            url = '/merchant/api/update';
+            data.id = parseInt(id);
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast(id ? '更新成功' : '添加成功', 'success');
+                merchantModalInstance.hide();
+                loadMerchantList();
+            } else {
+                showToast(result.msg || '操作失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('保存商户失败:', error);
+            showToast('保存失败', 'error');
+        });
+    }
+
+    function deleteMerchant(id) {
+        if (!confirm('确定要删除该商户吗？')) {
+            return;
+        }
+
+        fetch(`/merchant/api/delete/${id}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                showToast('删除成功', 'success');
+                loadMerchantList();
+            } else {
+                showToast(result.msg || '删除失败', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('删除商户失败:', error);
+            showToast('删除失败', 'error');
+        });
+    }
+</script>
+</body>
+</html>
