@@ -1,0 +1,132 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #dcdfe6;
+  border-radius: 3px;
+  
+  &:hover {
+    background-color: #c0c4cc;
+  }
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f5f7fa;
+}
+
+.page-container {
+  background: #fff;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.table-container {
+  margin-top: 20px;
+  
+  .el-table {
+    .el-table__header-wrapper {
+      th {
+        background-color: #f5f7fa !important;
+      }
+    }
+  }
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.search-form {
+  .el-form-item {
+    margin-bottom: 10px;
+  }
+}
+
+.el-dialog {
+  .el-dialog__header {
+    background-color: #f5f7fa;
+    padding: 15px 20px;
+  }
+  
+  .el-dialog__body {
+    padding: 20px;
+  }
+}
+
+.el-card {
+  border: none;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+}
+
+.el-table .el-table__cell {
+  padding: 12px 0;
+}
+
+.btn-group {
+  button {
+    margin-right: 8px;
+  }
+  
+  button:last-child {
+    margin-right: 0;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}

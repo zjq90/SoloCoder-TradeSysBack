@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - 后台管理系统'">后台管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+<body>
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <div class="sidebar-brand">
+            <a href="/">
+                <i class="bi bi-gear-wide-connected"></i>
+                后台管理系统
+            </a>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="menu-item active">
+                <i class="bi bi-house-door"></i>
+                首页
+            </a>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-gear"></i>
+                系统管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/system/user" class="menu-item">
+                    <i class="bi bi-person-circle"></i>
+                    系统用户管理
+                </a>
+                <a href="/system/role" class="menu-item">
+                    <i class="bi bi-people-fill"></i>
+                    角色管理
+                </a>
+                <a href="/system/permission" class="menu-item">
+                    <i class="bi bi-key-fill"></i>
+                    权限管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-person-badge"></i>
+                用户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent" class="menu-item">
+                    <i class="bi bi-building"></i>
+                    代理商管理
+                </a>
+                <a href="/merchant" class="menu-item">
+                    <i class="bi bi-shop"></i>
+                    商户管理
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-box-seam"></i>
+                产品管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/product" class="menu-item">
+                    <i class="bi bi-box"></i>
+                    产品信息
+                </a>
+                <a href="/machine" class="menu-item">
+                    <i class="bi bi-hdd"></i>
+                    机器信息
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-wallet2"></i>
+                账户管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/agent-account" class="menu-item">
+                    <i class="bi bi-credit-card"></i>
+                    代理账户
+                </a>
+                <a href="/profit" class="menu-item">
+                    <i class="bi bi-cash-stack"></i>
+                    分润信息
+                </a>
+                <a href="/account-detail" class="menu-item">
+                    <i class="bi bi-list-ul"></i>
+                    账户明细
+                </a>
+                <a href="/statement" class="menu-item">
+                    <i class="bi bi-file-earmark-text"></i>
+                    对账单
+                </a>
+            </div>
+
+            <a href="javascript:void(0)" class="menu-item" onclick="toggleMenu(this)">
+                <i class="bi bi-shuffle"></i>
+                交易管理
+                <i class="bi bi-chevron-down arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="/channel" class="menu-item">
+                    <i class="bi bi-link-45deg"></i>
+                    通道管理
+                </a>
+                <a href="/transaction" class="menu-item">
+                    <i class="bi bi-bar-chart-line"></i>
+                    交易明细
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <nav class="topbar">
+            <div class="topbar-title" th:text="${pageTitle}">首页</div>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <div class="user-info" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar" th:text="${currentUser != null ? (currentUser.realName != null ? #strings.substring(currentUser.realName, 0, 1) : #strings.substring(currentUser.username, 0, 1)) : '管'}">管</div>
+                        <div>
+                            <div class="user-name" th:text="${currentUser != null ? (currentUser.realName != null ? currentUser.realName : currentUser.username) : '管理员'}">管理员</div>
+                            <div class="user-role" th:text="${currentRole != null ? currentRole : '系统管理员'}">系统管理员</div>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="showUserProfile()">
+                            <i class="bi bi-person-circle"></i> 个人信息
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" style="display: inline;">
+                                <button type="submit" class="dropdown-item text-danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="modal fade" id="userProfileModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-person-circle"></i> 个人信息</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <div class="avatar-large mx-auto mb-3" id="profileAvatar">管</div>
+                            <h5 id="profileUsername">管理员</h5>
+                            <span class="badge bg-primary" id="profileRole">系统管理员</span>
+                        </div>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th width="100">用户名:</th>
+                                <td id="profileUsername2">-</td>
+                            </tr>
+                            <tr>
+                                <th>姓名:</th>
+                                <td id="profileRealName">-</td>
+                            </tr>
+                            <tr>
+                                <th>手机:</th>
+                                <td id="profilePhone">-</td>
+                            </tr>
+                            <tr>
+                                <th>邮箱:</th>
+                                <td id="profileEmail">-</td>
+                            </tr>
+                            <tr>
+                                <th>状态:</th>
+                                <td><span class="badge bg-success" id="profileStatus">正常</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-content">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">首页</a></li>
+                    <li class="breadcrumb-item active">仪表盘</li>
+                </ol>
+            </nav>
+
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card primary h-100 py-2">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs stat-label text-uppercase mb-1">总代理商数</div>
+                                    <div class="h5 mb-0 font-weight-bold stat-value" id="stat-agents">0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-building stat-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card success h-100 py-2">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs stat-label text-uppercase mb-1">总商户数</div>
+                                    <div class="h5 mb-0 font-weight-bold stat-value" id="stat-merchants">0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-shop stat-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card info h-100 py-2">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs stat-label text-uppercase mb-1">今日交易额</div>
+                                    <div class="h5 mb-0 font-weight-bold stat-value">¥<span id="stat-today-amount">0</span></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-currency-yuan stat-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card warning h-100 py-2">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs stat-label text-uppercase mb-1">今日交易笔数</div>
+                                    <div class="h5 mb-0 font-weight-bold stat-value" id="stat-today-count">0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-receipt stat-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card stat-card primary h-100 py-2">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs stat-label text-uppercase mb-1">今日分润</div>
+                                    <div class="h5 mb-0 font-weight-bold stat-value">¥<span id="stat-today-profit">0</span></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-graph-up-arrow stat-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card stat-card success h-100 py-2">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs stat-label text-uppercase mb-1">总机器数</div>
+                                    <div class="h5 mb-0 font-weight-bold stat-value" id="stat-machines">0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-hdd-stack stat-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card stat-card info h-100 py-2">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs stat-label text-uppercase mb-1">昨日交易额</div>
+                                    <div class="h5 mb-0 font-weight-bold stat-value">¥<span id="stat-yesterday-amount">0</span></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-bar-chart stat-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-8 col-lg-7">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">近30天交易趋势</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="transactionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-lg-5">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">近30天新增统计</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="growthChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x" style="z-index: 9999; margin-top: 20px;">
+    <div id="toast" class="toast" role="alert" data-bs-delay="2000">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:src="@{/js/common.js}"></script>
+<script>
+    function showUserProfile() {
+        const username = document.querySelector('.user-name')?.textContent || '管理员';
+        const role = document.querySelector('.user-role')?.textContent || '系统管理员';
+        
+        document.getElementById('profileAvatar').textContent = username.charAt(0);
+        document.getElementById('profileUsername').textContent = username;
+        document.getElementById('profileUsername2').textContent = username;
+        document.getElementById('profileRole').textContent = role;
+        
+        document.getElementById('profileRealName').textContent = '-';
+        document.getElementById('profilePhone').textContent = '-';
+        document.getElementById('profileEmail').textContent = '-';
+        
+        const modal = new bootstrap.Modal(document.getElementById('userProfileModal'));
+        modal.show();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDashboardData();
+    });
+
+    function loadDashboardData() {
+        fetch('/api/dashboard/overview')
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    const data = result.data;
+                    document.getElementById('stat-agents').textContent = data.totalAgents || 0;
+                    document.getElementById('stat-merchants').textContent = data.totalMerchants || 0;
+                    document.getElementById('stat-today-amount').textContent = formatNumber(data.todayAmount || 0);
+                    document.getElementById('stat-today-count').textContent = data.todayCount || 0;
+                    document.getElementById('stat-today-profit').textContent = formatNumber(data.todayProfit || 0);
+                    document.getElementById('stat-machines').textContent = data.totalMachines || 0;
+                    document.getElementById('stat-yesterday-amount').textContent = formatNumber(data.yesterdayAmount || 0);
+                }
+            })
+            .catch(error => {
+                console.error('加载统计数据失败:', error);
+            });
+
+        fetch('/api/dashboard/trend')
+            .then(response => response.json())
+            .then(result => {
+                if (result.code === 200 && result.data) {
+                    renderTransactionChart(result.data);
+                    renderGrowthChart(result.data);
+                }
+            })
+            .catch(error => {
+                console.error('加载趋势数据失败:', error);
+            });
+    }
+
+    function renderTransactionChart(data) {
+        const ctx = document.getElementById('transactionChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.dates || [],
+                datasets: [{
+                    label: '交易额(万元)',
+                    data: data.transactionAmounts ? data.transactionAmounts.map(v => v / 10000) : [],
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    borderColor: 'rgba(78, 115, 223, 1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '万';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderGrowthChart(data) {
+        const ctx = document.getElementById('growthChart').getContext('2d');
+
+        const dates = data.dates ? data.dates.slice(-7) : [];
+        const merchantCounts = data.merchantCounts ? data.merchantCounts.slice(-7) : [];
+        const agentCounts = data.agentCounts ? data.agentCounts.slice(-7) : [];
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dates,
+                datasets: [
+                    {
+                        label: '新增商户',
+                        data: merchantCounts,
+                        backgroundColor: 'rgba(28, 200, 138, 0.8)',
+                        borderColor: 'rgba(28, 200, 138, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '新增代理',
+                        data: agentCounts,
+                        backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                        borderColor: 'rgba(78, 115, 223, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>
